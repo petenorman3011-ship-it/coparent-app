@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+  <title>CoParent — Together for your child</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    :root {
+      --teal: #0d9488;
+      --teal-light: #ccfbf1;
+      --teal-dark: #0f766e;
+      --rose: #e11d48;
+      --rose-light: #ffe4e6;
+      --parent-a: #0d9488;
+      --parent-b: #7c3aed;
+      --parent-a-light: #ccfbf1;
+      --parent-b-light: #ede9fe;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --radius: 16px;
+      --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.06);
+    }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+    /* ── AUTH SCREEN ── */
+    .auth-screen {
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; padding: 24px;
+      background: linear-gradient(135deg, #0d9488 0%, #0891b2 100%);
+    }
+    .auth-logo { text-align: center; margin-bottom: 40px; }
+    .auth-logo-icon { width: 72px; height: 72px; background: rgba(255,255,255,0.2); border-radius: 24px; display: flex; align-items: center; justify-content: center; font-size: 36px; margin: 0 auto 16px; }
+    .auth-logo h1 { color: #fff; font-size: 28px; font-weight: 800; }
+    .auth-logo p { color: rgba(255,255,255,0.75); font-size: 14px; margin-top: 4px; }
+    .auth-card { background: #fff; border-radius: 24px; padding: 32px 24px; width: 100%; max-width: 400px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); }
+    .auth-card h2 { font-size: 20px; font-weight: 700; margin-bottom: 24px; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 13px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%; padding: 14px 16px; border: 1.5px solid var(--border);
+      border-radius: 12px; font-size: 16px; font-family: 'Inter', sans-serif;
+      outline: none; transition: border-color 0.2s; background: #fff; color: var(--text);
+    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--teal); }
+    .btn { width: 100%; padding: 16px; border: none; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.2s; font-family: 'Inter', sans-serif; }
+    .btn-primary { background: var(--teal); color: #fff; }
+    .btn-primary:hover { background: var(--teal-dark); }
+    .btn-secondary { background: var(--bg); color: var(--text); border: 1.5px solid var(--border); }
+    .btn-sm { padding: 10px 18px; font-size: 14px; width: auto; border-radius: 10px; }
+    .auth-switch { text-align: center; margin-top: 16px; font-size: 14px; color: var(--text-muted); }
+    .auth-switch a { color: var(--teal); font-weight: 600; cursor: pointer; }
+    .parent-select { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+    .parent-opt { padding: 16px; border: 2px solid var(--border); border-radius: 12px; text-align: center; cursor: pointer; transition: all 0.2s; }
+    .parent-opt.selected-a { border-color: var(--parent-a); background: var(--parent-a-light); }
+    .parent-opt.selected-b { border-color: var(--parent-b); background: var(--parent-b-light); }
+    .parent-opt .emoji { font-size: 28px; margin-bottom: 6px; }
+    .parent-opt .label { font-size: 13px; font-weight: 600; }
+
+    /* ── APP SHELL ── */
+    .app { display: none; flex-direction: column; min-height: 100vh; max-width: 480px; margin: 0 auto; }
+    .app.visible { display: flex; }
+
+    /* ── TOP BAR ── */
+    .topbar {
+      position: sticky; top: 0; z-index: 50;
+      background: #fff; border-bottom: 1px solid var(--border);
+      padding: 16px 20px; display: flex; align-items: center; justify-content: space-between;
+    }
+    .topbar-logo { font-size: 18px; font-weight: 800; color: var(--teal); display: flex; align-items: center; gap: 8px; }
+    .topbar-user { display: flex; align-items: center; gap: 8px; }
+    .avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: #fff; flex-shrink: 0; }
+    .avatar-a { background: var(--parent-a); }
+    .avatar-b { background: var(--parent-b); }
+
+    /* ── CONTENT ── */
+    .content { flex: 1; overflow-y: auto; padding: 0 0 100px; }
+
+    /* ── BOTTOM NAV ── */
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+      width: 100%; max-width: 480px;
+      background: #fff; border-top: 1px solid var(--border);
+      display: flex; padding: 8px 0 20px; z-index: 50;
+    }
+    .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 4px; cursor: pointer; transition: all 0.2s; border: none; background: none; }
+    .nav-item .nav-icon { font-size: 22px; transition: transform 0.2s; }
+    .nav-item .nav-label { font-size: 10px; font-weight: 600; color: var(--text-muted); letter-spacing: 0.3px; }
+    .nav-item.active .nav-label { color: var(--teal); }
+    .nav-item.active .nav-icon { transform: scale(1.15); }
+    .nav-badge { position: relative; }
+    .badge { position: absolute; top: -4px; right: -6px; background: var(--rose); color: #fff; font-size: 10px; font-weight: 700; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+
+    /* ── SCREENS ── */
+    .screen { display: none; padding: 20px; }
+    .screen.active { display: block; }
+
+    /* ── CARDS ── */
+    .card { background: var(--card); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); margin-bottom: 16px; border: 1px solid var(--border); }
+    .card-title { font-size: 16px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+
+    /* ── HOME SCREEN ── */
+    .greeting { font-size: 22px; font-weight: 800; margin-bottom: 4px; }
+    .greeting-sub { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; }
+    .today-card { background: linear-gradient(135deg, var(--teal), #0891b2); border-radius: var(--radius); padding: 20px; color: #fff; margin-bottom: 16px; }
+    .today-card h3 { font-size: 14px; opacity: 0.8; margin-bottom: 4px; }
+    .today-card .who { font-size: 20px; font-weight: 800; }
+    .today-card .handover { font-size: 13px; opacity: 0.85; margin-top: 8px; }
+    .quick-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+    .quick-btn { background: var(--card); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 18px 16px; display: flex; flex-direction: column; align-items: flex-start; gap: 8px; cursor: pointer; transition: all 0.2s; box-shadow: var(--shadow); }
+    .quick-btn:hover { border-color: var(--teal); transform: translateY(-1px); }
+    .quick-btn .qb-icon { font-size: 28px; }
+    .quick-btn .qb-label { font-size: 13px; font-weight: 700; }
+    .quick-btn .qb-sub { font-size: 11px; color: var(--text-muted); }
+    .recent-log { }
+    .log-entry { display: flex; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--border); }
+    .log-entry:last-child { border-bottom: none; }
+    .log-avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+    .log-body { flex: 1; }
+    .log-meta { font-size: 12px; color: var(--text-muted); margin-bottom: 2px; }
+    .log-text { font-size: 14px; font-weight: 500; }
+    .log-tag { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 100px; margin-top: 4px; }
+
+    /* ── MESSAGES ── */
+    .messages-list { display: flex; flex-direction: column; gap: 12px; padding-bottom: 80px; }
+    .msg-bubble { max-width: 80%; padding: 12px 16px; border-radius: 18px; font-size: 15px; line-height: 1.5; position: relative; }
+    .msg-bubble.me { align-self: flex-end; border-bottom-right-radius: 4px; }
+    .msg-bubble.them { align-self: flex-start; border-bottom-left-radius: 4px; background: #f1f5f9; color: var(--text); }
+    .msg-bubble.me.parent-a { background: var(--parent-a); color: #fff; }
+    .msg-bubble.me.parent-b { background: var(--parent-b); color: #fff; }
+    .msg-time { font-size: 11px; opacity: 0.6; margin-top: 4px; }
+    .msg-compose { position: fixed; bottom: 70px; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; padding: 12px 16px; background: #fff; border-top: 1px solid var(--border); display: flex; gap: 10px; align-items: flex-end; z-index: 40; }
+    .msg-input { flex: 1; padding: 12px 16px; border: 1.5px solid var(--border); border-radius: 24px; font-size: 15px; font-family: 'Inter', sans-serif; outline: none; resize: none; max-height: 120px; line-height: 1.5; }
+    .msg-input:focus { border-color: var(--teal); }
+    .send-btn { width: 44px; height: 44px; border-radius: 50%; border: none; background: var(--teal); color: #fff; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; }
+    .send-btn:hover { background: var(--teal-dark); }
+    .moderation-warning { background: #fff7ed; border: 1.5px solid #fed7aa; border-radius: 12px; padding: 16px; margin: 12px 0; }
+    .mod-title { font-size: 14px; font-weight: 700; color: #c2410c; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+    .mod-text { font-size: 13px; color: #7c2d12; line-height: 1.5; margin-bottom: 12px; }
+    .mod-suggestion { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 10px 12px; font-size: 13px; color: #166534; margin-bottom: 12px; font-style: italic; }
+    .mod-actions { display: flex; gap: 8px; }
+
+    /* ── LOG SCREEN ── */
+    .log-form .log-section { margin-bottom: 20px; }
+    .log-section-title { font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+    .log-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip { padding: 8px 14px; border: 1.5px solid var(--border); border-radius: 100px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s; background: #fff; }
+    .chip.selected { border-color: var(--teal); background: var(--teal-light); color: var(--teal-dark); font-weight: 600; }
+    .time-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .mood-row { display: flex; gap: 12px; }
+    .mood-btn { flex: 1; padding: 12px 8px; border: 2px solid var(--border); border-radius: 12px; text-align: center; cursor: pointer; transition: all 0.2s; font-size: 11px; font-weight: 600; background: #fff; }
+    .mood-btn .mood-emoji { font-size: 28px; display: block; margin-bottom: 4px; }
+    .mood-btn.selected { border-color: var(--teal); background: var(--teal-light); }
+
+    /* ── CALENDAR ── */
+    .cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .cal-nav { width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid var(--border); background: #fff; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .cal-title { font-size: 18px; font-weight: 700; }
+    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+    .cal-dow { text-align: center; font-size: 11px; font-weight: 700; color: var(--text-muted); padding: 6px 0; text-transform: uppercase; }
+    .cal-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 10px; font-size: 14px; font-weight: 500; cursor: pointer; position: relative; transition: all 0.2s; }
+    .cal-day.empty { }
+    .cal-day.parent-a { background: var(--parent-a-light); color: var(--teal-dark); font-weight: 600; }
+    .cal-day.parent-b { background: var(--parent-b-light); color: #5b21b6; font-weight: 600; }
+    .cal-day.today { outline: 2px solid var(--teal); outline-offset: 2px; }
+    .cal-day.has-request::after { content: ''; position: absolute; top: 4px; right: 4px; width: 6px; height: 6px; border-radius: 50%; background: var(--rose); }
+    .cal-legend { display: flex; gap: 16px; margin-top: 16px; }
+    .legend-item { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; }
+    .legend-dot { width: 12px; height: 12px; border-radius: 4px; }
+
+    /* ── REQUESTS ── */
+    .request-card { border-left: 4px solid; padding: 16px; border-radius: 0 12px 12px 0; background: var(--card); margin-bottom: 12px; box-shadow: var(--shadow); }
+    .request-card.pending { border-color: #f59e0b; }
+    .request-card.accepted { border-color: #10b981; }
+    .request-card.rejected { border-color: var(--rose); }
+    .req-status { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; }
+    .req-status.pending { color: #b45309; }
+    .req-status.accepted { color: #047857; }
+    .req-status.rejected { color: var(--rose); }
+    .req-dates { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+    .req-reason { font-size: 13px; color: var(--text-muted); margin-bottom: 12px; }
+    .req-actions { display: flex; gap: 8px; }
+    .btn-accept { background: #10b981; color: #fff; border: none; padding: 10px 20px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; }
+    .btn-reject { background: var(--rose-light); color: var(--rose); border: none; padding: 10px 20px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; }
+
+    /* ── NOTIFICATIONS ── */
+    .notif-item { display: flex; gap: 14px; padding: 16px 0; border-bottom: 1px solid var(--border); align-items: flex-start; }
+    .notif-icon { width: 44px; height: 44px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+    .notif-body { flex: 1; }
+    .notif-title { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+    .notif-sub { font-size: 13px; color: var(--text-muted); }
+    .notif-time { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .notif-item.unread .notif-title::before { content: '●'; color: var(--teal); font-size: 8px; margin-right: 6px; vertical-align: middle; }
+
+    /* ── MODAL ── */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; align-items: flex-end; justify-content: center; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: #fff; border-radius: 24px 24px 0 0; padding: 24px 20px 40px; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; }
+    .modal-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 20px; }
+    .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 20px; }
+
+    /* ── TOAST ── */
+    .toast { position: fixed; top: 80px; left: 50%; transform: translateX(-50%) translateY(-20px); background: #1e293b; color: #fff; padding: 12px 20px; border-radius: 100px; font-size: 14px; font-weight: 500; opacity: 0; transition: all 0.3s; z-index: 300; white-space: nowrap; pointer-events: none; }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ── MISC ── */
+    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .section-title-lg { font-size: 20px; font-weight: 800; }
+    .empty-state { text-align: center; padding: 48px 24px; color: var(--text-muted); }
+    .empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; }
+    .empty-state p { font-size: 15px; }
+    .tag-pill { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 100px; font-size: 12px; font-weight: 600; }
+    .tag-meal { background: #fef3c7; color: #92400e; }
+    .tag-nap { background: #dbeafe; color: #1e40af; }
+    .tag-mood { background: #f3e8ff; color: #6b21a8; }
+    .tag-note { background: #f0fdf4; color: #166534; }
+    .divider { height: 1px; background: var(--border); margin: 16px 0; }
+
+    @media (min-width: 481px) {
+      .app { border-left: 1px solid var(--border); border-right: 1px solid var(--border); box-shadow: 0 0 40px rgba(0,0,0,0.1); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ AUTH SCREEN ══ -->
+<div class="auth-screen" id="authScreen">
+  <div class="auth-logo">
+    <div class="auth-logo-icon">🤝</div>
+    <h1>CoParent</h1>
+    <p>Together for your child</p>
+  </div>
+  <div class="auth-card" id="loginCard">
+    <h2>Welcome back</h2>
+    <div class="form-group">
+      <label>Who are you?</label>
+      <div class="parent-select">
+        <div class="parent-opt" id="optA" onclick="selectParent('A')">
+          <div class="emoji">👩</div>
+          <div class="label" style="color:var(--parent-a);">Parent A</div>
+        </div>
+        <div class="parent-opt" id="optB" onclick="selectParent('B')">
+          <div class="emoji">👨</div>
+          <div class="label" style="color:var(--parent-b);">Parent B</div>
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="passwordInput" placeholder="Enter your password"/>
+    </div>
+    <button class="btn btn-primary" onclick="login()" style="margin-bottom:12px;">Sign In</button>
+    <div class="auth-switch">New here? <a onclick="showSetup()">Set up your account</a></div>
+  </div>
+  <!-- Setup card (hidden by default) -->
+  <div class="auth-card" id="setupCard" style="display:none;">
+    <h2>Set up CoParent</h2>
+    <div class="form-group">
+      <label>Your name</label>
+      <input type="text" id="setupName" placeholder="e.g. Sarah"/>
+    </div>
+    <div class="form-group">
+      <label>You are...</label>
+      <div class="parent-select">
+        <div class="parent-opt" id="setupOptA" onclick="selectSetupParent('A')">
+          <div class="emoji">👩</div>
+          <div class="label" style="color:var(--parent-a);">Parent A</div>
+        </div>
+        <div class="parent-opt" id="setupOptB" onclick="selectSetupParent('B')">
+          <div class="emoji">👨</div>
+          <div class="label" style="color:var(--parent-b);">Parent B</div>
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Child's name</label>
+      <input type="text" id="setupChild" placeholder="e.g. Olivia"/>
+    </div>
+    <div class="form-group">
+      <label>Set your password</label>
+      <input type="password" id="setupPass" placeholder="Choose a password"/>
+    </div>
+    <button class="btn btn-primary" onclick="setupAccount()" style="margin-bottom:12px;">Create Account</button>
+    <div class="auth-switch"><a onclick="showLogin()">Already set up? Sign in</a></div>
+  </div>
+</div>
+
+<!-- ══ APP ══ -->
+<div class="app" id="app">
+  <!-- Top Bar -->
+  <div class="topbar">
+    <div class="topbar-logo">🤝 CoParent</div>
+    <div class="topbar-user">
+      <span id="topbarName" style="font-size:13px;font-weight:600;color:var(--text-muted);"></span>
+      <div class="avatar" id="topbarAvatar"></div>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="content">
+
+    <!-- ── HOME ── -->
+    <div class="screen active" id="screen-home">
+      <div class="greeting" id="homeGreeting"></div>
+      <div class="greeting-sub" id="homeSubtitle"></div>
+
+      <div class="today-card">
+        <h3>Today</h3>
+        <div class="who" id="todayWho">Loading...</div>
+        <div class="handover" id="todayHandover"></div>
+      </div>
+
+      <div class="quick-actions">
+        <div class="quick-btn" onclick="showScreen('log'); openLogModal()">
+          <div class="qb-icon">📝</div>
+          <div class="qb-label">Add Log</div>
+          <div class="qb-sub">Record today</div>
+        </div>
+        <div class="quick-btn" onclick="showScreen('messages')">
+          <div class="qb-icon">💬</div>
+          <div class="qb-label">Message</div>
+          <div class="qb-sub">Send an update</div>
+        </div>
+        <div class="quick-btn" onclick="showScreen('calendar')">
+          <div class="qb-icon">📅</div>
+          <div class="qb-label">Calendar</div>
+          <div class="qb-sub">View schedule</div>
+        </div>
+        <div class="quick-btn" onclick="showScreen('log')">
+          <div class="qb-icon">📚</div>
+          <div class="qb-label">Daily Log</div>
+          <div class="qb-sub">View entries</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">📋 Recent Activity</div>
+        <div id="recentActivity"></div>
+      </div>
+    </div>
+
+    <!-- ── MESSAGES ── -->
+    <div class="screen" id="screen-messages">
+      <div class="section-header">
+        <div class="section-title-lg">Messages</div>
+      </div>
+      <div class="messages-list" id="messagesList"></div>
+    </div>
+
+    <!-- ── LOG ── -->
+    <div class="screen" id="screen-log">
+      <div class="section-header">
+        <div class="section-title-lg">Daily Log</div>
+        <button class="btn btn-primary btn-sm" onclick="openLogModal()">+ Add Entry</button>
+      </div>
+      <div id="logFeed"></div>
+    </div>
+
+    <!-- ── CALENDAR ── -->
+    <div class="screen" id="screen-calendar">
+      <div class="section-title-lg" style="margin-bottom:20px;">Schedule</div>
+
+      <div class="card">
+        <div class="cal-header">
+          <button class="cal-nav" onclick="prevMonth()">‹</button>
+          <div class="cal-title" id="calTitle"></div>
+          <button class="cal-nav" onclick="nextMonth()">›</button>
+        </div>
+        <div class="cal-grid" id="calGrid"></div>
+        <div class="cal-legend">
+          <div class="legend-item">
+            <div class="legend-dot" style="background:var(--parent-a);"></div>
+            <span id="legendA">Parent A</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:var(--parent-b);"></div>
+            <span id="legendB">Parent B</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🔄 Schedule Changes</div>
+        <button class="btn btn-secondary btn-sm" onclick="openRequestModal()" style="margin-bottom:16px;width:100%;">Request a Change</button>
+        <div id="requestsList"></div>
+      </div>
+    </div>
+
+    <!-- ── NOTIFICATIONS ── -->
+    <div class="screen" id="screen-notifications">
+      <div class="section-title-lg" style="margin-bottom:20px;">Notifications</div>
+      <div id="notifList"></div>
+    </div>
+
+  </div>
+
+  <!-- Bottom Nav -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" id="nav-home" onclick="showScreen('home')">
+      <span class="nav-icon">🏠</span>
+      <span class="nav-label">Home</span>
+    </button>
+    <button class="nav-item" id="nav-messages" onclick="showScreen('messages')">
+      <span class="nav-badge">
+        <span class="nav-icon">💬</span>
+        <span class="badge" id="msgBadge" style="display:none;">1</span>
+      </span>
+      <span class="nav-label">Messages</span>
+    </button>
+    <button class="nav-item" id="nav-log" onclick="showScreen('log')">
+      <span class="nav-icon">📝</span>
+      <span class="nav-label">Log</span>
+    </button>
+    <button class="nav-item" id="nav-calendar" onclick="showScreen('calendar')">
+      <span class="nav-icon">📅</span>
+      <span class="nav-label">Calendar</span>
+    </button>
+    <button class="nav-item" id="nav-notifications" onclick="showScreen('notifications')">
+      <span class="nav-badge">
+        <span class="nav-icon">🔔</span>
+        <span class="badge" id="notifBadge">3</span>
+      </span>
+      <span class="nav-label">Alerts</span>
+    </button>
+  </nav>
+</div>
+
+<!-- ══ MODALS ══ -->
+
+<!-- Log Entry Modal -->
+<div class="modal-overlay" id="logModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">📝 Add Log Entry</div>
+    <div class="log-form">
+      <!-- Meals -->
+      <div class="log-section">
+        <div class="log-section-title">🍽 Meals eaten</div>
+        <div class="log-chips" id="mealChips">
+          <div class="chip" onclick="toggleChip(this)">Breakfast</div>
+          <div class="chip" onclick="toggleChip(this)">Lunch</div>
+          <div class="chip" onclick="toggleChip(this)">Dinner</div>
+          <div class="chip" onclick="toggleChip(this)">Snack</div>
+          <div class="chip" onclick="toggleChip(this)">Good appetite</div>
+          <div class="chip" onclick="toggleChip(this)">Poor appetite</div>
+        </div>
+      </div>
+      <!-- Drinks -->
+      <div class="log-section">
+        <div class="log-section-title">💧 Liquids</div>
+        <div class="log-chips">
+          <div class="chip" onclick="toggleChip(this)">Water</div>
+          <div class="chip" onclick="toggleChip(this)">Milk</div>
+          <div class="chip" onclick="toggleChip(this)">Juice</div>
+          <div class="chip" onclick="toggleChip(this)">Good hydration</div>
+          <div class="chip" onclick="toggleChip(this)">Drinking little</div>
+        </div>
+      </div>
+      <!-- Nap -->
+      <div class="log-section">
+        <div class="log-section-title">😴 Nap time</div>
+        <div class="time-row">
+          <div class="form-group" style="margin:0;">
+            <label>Start</label>
+            <input type="time" id="napStart"/>
+          </div>
+          <div class="form-group" style="margin:0;">
+            <label>End</label>
+            <input type="time" id="napEnd"/>
+          </div>
+        </div>
+      </div>
+      <!-- Mood -->
+      <div class="log-section">
+        <div class="log-section-title">😊 Mood</div>
+        <div class="mood-row">
+          <div class="mood-btn" onclick="selectMood(this,'😄')"><span class="mood-emoji">😄</span>Happy</div>
+          <div class="mood-btn" onclick="selectMood(this,'😊')"><span class="mood-emoji">😊</span>Good</div>
+          <div class="mood-btn" onclick="selectMood(this,'😐')"><span class="mood-emoji">😐</span>Okay</div>
+          <div class="mood-btn" onclick="selectMood(this,'😢')"><span class="mood-emoji">😢</span>Upset</div>
+          <div class="mood-btn" onclick="selectMood(this,'😴')"><span class="mood-emoji">😴</span>Tired</div>
+        </div>
+      </div>
+      <!-- Notes -->
+      <div class="log-section">
+        <div class="log-section-title">📝 Notes</div>
+        <textarea id="logNotes" placeholder="Anything else to share about today..." rows="3" style="width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:12px;font-size:15px;font-family:'Inter',sans-serif;outline:none;resize:none;"></textarea>
+      </div>
+      <button class="btn btn-primary" onclick="saveLog()" style="margin-top:8px;">Save Entry</button>
+      <button class="btn btn-secondary" onclick="closeModal('logModal')" style="margin-top:8px;">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Schedule Change Request Modal -->
+<div class="modal-overlay" id="requestModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">📅 Request Schedule Change</div>
+    <div class="form-group">
+      <label>Date you'd like to change</label>
+      <input type="date" id="reqDate"/>
+    </div>
+    <div class="form-group">
+      <label>Reason (optional)</label>
+      <textarea id="reqReason" rows="3" placeholder="e.g. Work commitment, family event..." style="width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:12px;font-size:15px;font-family:'Inter',sans-serif;outline:none;resize:none;"></textarea>
+    </div>
+    <button class="btn btn-primary" onclick="submitRequest()" style="margin-bottom:8px;">Submit Request</button>
+    <button class="btn btn-secondary" onclick="closeModal('requestModal')">Cancel</button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ══ STATE ══
+let state = {
+  currentParent: null,
+  parentAName: 'Parent A',
+  parentBName: 'Parent B',
+  childName: 'your child',
+  messages: [
+    { id: 1, from: 'B', text: 'Just to let you know, she had a great day at nursery today 😊', time: '10:32' },
+    { id: 2, from: 'A', text: 'That\'s wonderful to hear! Did she eat well?', time: '10:45' },
+    { id: 3, from: 'B', text: 'Yes, finished all her lunch. Napped from 1pm to 2:30pm too.', time: '10:47' },
+  ],
+  logs: [
+    { id: 1, parent: 'B', time: '12:30', date: 'Today', meals: ['Lunch', 'Good appetite'], drinks: ['Water', 'Milk'], nap: '13:00–14:30', mood: '😄', notes: 'Had a lovely time at the park this morning.' },
+    { id: 2, parent: 'A', time: '08:00', date: 'Today', meals: ['Breakfast'], drinks: ['Milk'], nap: null, mood: '😊', notes: 'Woke up in a great mood. Ate all her porridge.' },
+  ],
+  requests: [
+    { id: 1, from: 'B', dates: '24 Apr 2026', reason: 'Work training day — can we swap?', status: 'pending' },
+    { id: 2, from: 'A', dates: '10 Apr 2026', reason: 'Family birthday', status: 'accepted' },
+    { id: 3, from: 'B', dates: '2 Apr 2026', reason: 'Short notice — sorry', status: 'rejected' },
+  ],
+  notifications: [
+    { icon: '💬', bg: '#ccfbf1', title: 'New message from Parent B', sub: '"Just to let you know, she had a great day..."', time: '10 min ago', unread: true },
+    { icon: '📝', bg: '#dbeafe', title: 'New log entry added', sub: 'Parent B logged lunch, nap and mood', time: '1 hr ago', unread: true },
+    { icon: '📅', bg: '#fef3c7', title: 'Schedule change requested', sub: 'Parent B requested a change for 24 Apr', time: '2 hrs ago', unread: true },
+    { icon: '✅', bg: '#d1fae5', title: 'Change request accepted', sub: 'Your request for 10 Apr was accepted', time: 'Yesterday', unread: false },
+    { icon: '🔔', bg: '#ede9fe', title: 'Handover reminder', sub: 'Changeover tomorrow at 5pm', time: 'Yesterday', unread: false },
+  ],
+  calMonth: new Date().getMonth(),
+  calYear: new Date().getFullYear(),
+  selectedMood: '',
+};
+
+// ══ SCHEDULE — Week 1/Week 2 pattern ══
+// Week 1: Mon-Wed = Parent A, Thu-Sun = Parent B
+// Week 2: Mon-Wed = Parent B, Thu-Sun = Parent A
+function getParentForDate(date) {
+  const start = new Date(2026, 0, 5); // a known Monday for week 1
+  const diff = Math.floor((date - start) / (7 * 24 * 60 * 60 * 1000));
+  const weekNum = Math.floor(diff / 1) % 2;
+  const day = date.getDay(); // 0=Sun,1=Mon...6=Sat
+  const isWeek1 = (Math.floor((date - start) / (7 * 24 * 60 * 60 * 1000)) % 2 === 0);
+  if (isWeek1) {
+    return (day >= 1 && day <= 3) ? 'A' : 'B';
+  } else {
+    return (day >= 1 && day <= 3) ? 'B' : 'A';
+  }
+}
+
+// ══ AUTH ══
+let selectedParent = null;
+let setupParent = null;
+
+function selectParent(p) {
+  selectedParent = p;
+  document.getElementById('optA').className = 'parent-opt' + (p === 'A' ? ' selected-a' : '');
+  document.getElementById('optB').className = 'parent-opt' + (p === 'B' ? ' selected-b' : '');
+}
+
+function selectSetupParent(p) {
+  setupParent = p;
+  document.getElementById('setupOptA').className = 'parent-opt' + (p === 'A' ? ' selected-a' : '');
+  document.getElementById('setupOptB').className = 'parent-opt' + (p === 'B' ? ' selected-b' : '');
+}
+
+function showSetup() {
+  document.getElementById('loginCard').style.display = 'none';
+  document.getElementById('setupCard').style.display = 'block';
+}
+function showLogin() {
+  document.getElementById('setupCard').style.display = 'none';
+  document.getElementById('loginCard').style.display = 'block';
+}
+
+function setupAccount() {
+  const name = document.getElementById('setupName').value.trim();
+  const child = document.getElementById('setupChild').value.trim();
+  if (!name || !setupParent || !child) { showToast('Please fill in all fields'); return; }
+  if (setupParent === 'A') state.parentAName = name;
+  else state.parentBName = name;
+  state.childName = child;
+  state.currentParent = setupParent;
+  launchApp();
+}
+
+function login() {
+  if (!selectedParent) { showToast('Please select who you are'); return; }
+  state.currentParent = selectedParent;
+  launchApp();
+}
+
+function launchApp() {
+  document.getElementById('authScreen').style.display = 'none';
+  document.getElementById('app').classList.add('visible');
+  initApp();
+}
+
+// ══ APP INIT ══
+function initApp() {
+  const p = state.currentParent;
+  const name = p === 'A' ? state.parentAName : state.parentBName;
+  document.getElementById('topbarName').textContent = name;
+  const avatar = document.getElementById('topbarAvatar');
+  avatar.textContent = name[0].toUpperCase();
+  avatar.className = `avatar avatar-${p.toLowerCase()}`;
+  renderHome();
+  renderMessages();
+  renderLog();
+  renderCalendar();
+  renderRequests();
+  renderNotifications();
+  updateLegend();
+}
+
+function updateLegend() {
+  document.getElementById('legendA').textContent = state.parentAName;
+  document.getElementById('legendB').textContent = state.parentBName;
+}
+
+// ══ HOME ══
+function renderHome() {
+  const p = state.currentParent;
+  const name = p === 'A' ? state.parentAName : state.parentBName;
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+  document.getElementById('homeGreeting').textContent = `${greeting}, ${name} 👋`;
+  document.getElementById('homeSubtitle').textContent = `Here's what's happening with ${state.childName} today`;
+
+  const today = new Date();
+  const todayParent = getParentForDate(today);
+  const todayName = todayParent === 'A' ? state.parentAName : state.parentBName;
+  document.getElementById('todayWho').textContent = `${state.childName} is with ${todayName}`;
+
+  // Find next handover
+  let next = new Date(today); next.setDate(next.getDate() + 1);
+  let days = 1;
+  while (getParentForDate(next) === todayParent && days < 14) {
+    next.setDate(next.getDate() + 1); days++;
+  }
+  const nextName = getParentForDate(next) === 'A' ? state.parentAName : state.parentBName;
+  document.getElementById('todayHandover').textContent = `Next handover: ${next.toLocaleDateString('en-GB', {weekday:'short',day:'numeric',month:'short'})} → ${nextName}`;
+
+  // Recent activity
+  const ra = document.getElementById('recentActivity');
+  if (state.logs.length === 0) {
+    ra.innerHTML = '<div class="empty-state" style="padding:24px 0;"><div class="empty-icon">📋</div><p>No log entries yet</p></div>';
+    return;
+  }
+  ra.innerHTML = state.logs.slice(0, 3).map(log => {
+    const pName = log.parent === 'A' ? state.parentAName : state.parentBName;
+    const pColor = log.parent === 'A' ? 'var(--parent-a)' : 'var(--parent-b)';
+    return `<div class="log-entry">
+      <div class="log-avatar" style="background:${pColor}20;font-size:18px;">${log.mood || '📝'}</div>
+      <div class="log-body">
+        <div class="log-meta">${pName} · ${log.time} · ${log.date}</div>
+        <div class="log-text">${log.notes || log.meals?.join(', ') || 'Log entry'}</div>
+        ${log.nap ? `<span class="tag-pill tag-nap">😴 Nap ${log.nap}</span>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ══ MESSAGES ══
+const FLAGGED_WORDS = ['stupid','idiot','useless','hate','bloody','hell','damn','bastard','moron','liar','always','never','your fault','you never','you always','pathetic','disgusting','selfish','manipulative','abusive','threatening'];
+
+function moderateMessage(text) {
+  const lower = text.toLowerCase();
+  const found = FLAGGED_WORDS.filter(w => lower.includes(w));
+  return found.length > 0 ? found : null;
+}
+
+function getSuggestion(text) {
+  // Simple neutral rewrite suggestions
+  if (text.toLowerCase().includes('you never') || text.toLowerCase().includes('you always')) {
+    return 'Try: "I\'ve noticed that sometimes..." — focusing on specific situations rather than absolutes helps keep communication calm.';
+  }
+  return 'Try rephrasing to focus on the child\'s needs and specific situations rather than general statements about the other parent.';
+}
+
+function renderMessages() {
+  const p = state.currentParent;
+  const list = document.getElementById('messagesList');
+  list.innerHTML = state.messages.map(msg => {
+    const isMe = msg.from === p;
+    const bubbleClass = isMe ? `msg-bubble me parent-${p.toLowerCase()}` : 'msg-bubble them';
+    return `<div class="${bubbleClass}">
+      ${msg.text}
+      <div class="msg-time">${msg.time}</div>
+    </div>`;
+  }).join('');
+
+  // Compose bar
+  const existing = document.getElementById('composeBar');
+  if (!existing) {
+    const bar = document.createElement('div');
+    bar.id = 'composeBar';
+    bar.className = 'msg-compose';
+    bar.innerHTML = `
+      <textarea class="msg-input" id="msgInput" placeholder="Message..." rows="1" oninput="autoResize(this)"></textarea>
+      <button class="send-btn" onclick="sendMessage()">➤</button>`;
+    document.body.appendChild(bar);
+  }
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+function sendMessage() {
+  const input = document.getElementById('msgInput');
+  const text = input.value.trim();
+  if (!text) return;
+
+  const flags = moderateMessage(text);
+  if (flags) {
+    // Show moderation warning
+    const list = document.getElementById('messagesList');
+    const suggestion = getSuggestion(text);
+    const warningId = 'warn_' + Date.now();
+    const warningHtml = `<div class="moderation-warning" id="${warningId}">
+      <div class="mod-title">⚠️ Message flagged</div>
+      <div class="mod-text">This message may contain language that could escalate conflict. For ${state.childName}'s benefit, please consider rewording it calmly.</div>
+      <div class="mod-suggestion">💡 ${suggestion}</div>
+      <div class="mod-actions">
+        <button class="btn btn-secondary btn-sm" onclick="document.getElementById('${warningId}').remove();">Edit message</button>
+        <button class="btn btn-sm" style="background:#fee2e2;color:#991b1b;" onclick="forceSend('${text.replace(/'/g,"\\'")}','${warningId}')">Send anyway</button>
+      </div>
+    </div>`;
+    list.insertAdjacentHTML('beforeend', warningHtml);
+    list.scrollTop = list.scrollHeight;
+    return;
+  }
+
+  pushMessage(text);
+  input.value = '';
+  input.style.height = 'auto';
+}
+
+function forceSend(text, warningId) {
+  document.getElementById(warningId)?.remove();
+  pushMessage(text);
+}
+
+function pushMessage(text) {
+  const now = new Date();
+  const time = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+  state.messages.push({ id: Date.now(), from: state.currentParent, text, time });
+  renderMessages();
+  const list = document.getElementById('messagesList');
+  list.scrollTop = list.scrollHeight;
+  addNotification('💬', '#ccfbf1', 'Message sent', text.slice(0, 40) + (text.length > 40 ? '...' : ''));
+  showToast('Message sent ✓');
+}
+
+// ══ LOG ══
+function toggleChip(el) { el.classList.toggle('selected'); }
+function selectMood(el, emoji) {
+  document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  state.selectedMood = emoji;
+}
+
+function openLogModal() { document.getElementById('logModal').classList.add('open'); }
+
+function saveLog() {
+  const chips = [...document.querySelectorAll('#mealChips .chip.selected')].map(c => c.textContent);
+  const napStart = document.getElementById('napStart').value;
+  const napEnd = document.getElementById('napEnd').value;
+  const notes = document.getElementById('logNotes').value.trim();
+  const now = new Date();
+
+  const entry = {
+    id: Date.now(),
+    parent: state.currentParent,
+    time: now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }),
+    date: 'Today',
+    meals: chips.filter((_,i) => i < 4),
+    drinks: chips.filter((_,i) => i >= 4),
+    nap: napStart && napEnd ? `${napStart}–${napEnd}` : null,
+    mood: state.selectedMood,
+    notes,
+  };
+
+  state.logs.unshift(entry);
+  closeModal('logModal');
+  renderLog();
+  renderHome();
+  addNotification('📝', '#dbeafe', 'Log entry added', `${notes || 'New entry'}`);
+  showToast('Log saved ✓');
+
+  // Reset form
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+  document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
+  document.getElementById('napStart').value = '';
+  document.getElementById('napEnd').value = '';
+  document.getElementById('logNotes').value = '';
+  state.selectedMood = '';
+}
+
+function renderLog() {
+  const feed = document.getElementById('logFeed');
+  if (state.logs.length === 0) {
+    feed.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div><p>No log entries yet.<br/>Add the first one!</p></div>';
+    return;
+  }
+  feed.innerHTML = state.logs.map(log => {
+    const pName = log.parent === 'A' ? state.parentAName : state.parentBName;
+    const pColor = log.parent === 'A' ? 'var(--parent-a)' : 'var(--parent-b)';
+    return `<div class="card" style="border-left: 4px solid ${pColor};">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+        <div class="avatar avatar-${log.parent.toLowerCase()}" style="width:32px;height:32px;font-size:13px;">${pName[0]}</div>
+        <div>
+          <div style="font-size:13px;font-weight:700;">${pName}</div>
+          <div style="font-size:11px;color:var(--text-muted);">${log.date} · ${log.time}</div>
+        </div>
+        ${log.mood ? `<span style="font-size:24px;margin-left:auto;">${log.mood}</span>` : ''}
+      </div>
+      ${log.meals?.length ? `<div style="margin-bottom:8px;"><span class="tag-pill tag-meal">🍽 ${log.meals.join(' · ')}</span></div>` : ''}
+      ${log.drinks?.length ? `<div style="margin-bottom:8px;"><span class="tag-pill" style="background:#e0f2fe;color:#0369a1;">💧 ${log.drinks.join(' · ')}</span></div>` : ''}
+      ${log.nap ? `<div style="margin-bottom:8px;"><span class="tag-pill tag-nap">😴 Nap: ${log.nap}</span></div>` : ''}
+      ${log.notes ? `<div style="font-size:14px;color:var(--text);margin-top:8px;line-height:1.6;">${log.notes}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+// ══ CALENDAR ══
+function renderCalendar() {
+  const year = state.calYear, month = state.calMonth;
+  const title = new Date(year, month).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+  document.getElementById('calTitle').textContent = title;
+
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const today = new Date();
+  const dow = ['S','M','T','W','T','F','S'];
+
+  let html = dow.map(d => `<div class="cal-dow">${d}</div>`).join('');
+
+  // Empty cells before first day
+  for (let i = 0; i < firstDay; i++) html += '<div class="cal-day empty"></div>';
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const date = new Date(year, month, d);
+    const parent = getParentForDate(date);
+    const isToday = date.toDateString() === today.toDateString();
+    const hasReq = state.requests.some(r => r.dates.includes(d) && r.status === 'pending');
+    html += `<div class="cal-day parent-${parent.toLowerCase()}${isToday ? ' today' : ''}${hasReq ? ' has-request' : ''}" onclick="showDayDetail(${d},${month},${year})">${d}</div>`;
+  }
+
+  document.getElementById('calGrid').innerHTML = html;
+}
+
+function prevMonth() {
+  state.calMonth--;
+  if (state.calMonth < 0) { state.calMonth = 11; state.calYear--; }
+  renderCalendar();
+}
+function nextMonth() {
+  state.calMonth++;
+  if (state.calMonth > 11) { state.calMonth = 0; state.calYear++; }
+  renderCalendar();
+}
+
+function showDayDetail(d, m, y) {
+  const date = new Date(y, m, d);
+  const parent = getParentForDate(date);
+  const pName = parent === 'A' ? state.parentAName : state.parentBName;
+  const dateStr = date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
+  showToast(`${dateStr}: ${state.childName} with ${pName}`);
+}
+
+// ══ REQUESTS ══
+function openRequestModal() {
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('reqDate').value = today;
+  document.getElementById('requestModal').classList.add('open');
+}
+
+function submitRequest() {
+  const date = document.getElementById('reqDate').value;
+  const reason = document.getElementById('reqReason').value.trim();
+  if (!date) { showToast('Please select a date'); return; }
+
+  const d = new Date(date);
+  const dateStr = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  state.requests.unshift({ id: Date.now(), from: state.currentParent, dates: dateStr, reason: reason || 'No reason given', status: 'pending' });
+  closeModal('requestModal');
+  renderRequests();
+  addNotification('📅', '#fef3c7', 'Change request submitted', `Request for ${dateStr} sent`);
+  showToast('Request submitted ✓');
+  document.getElementById('reqReason').value = '';
+}
+
+function respondToRequest(id, response) {
+  const req = state.requests.find(r => r.id === id);
+  if (req) {
+    req.status = response;
+    renderRequests();
+    const label = response === 'accepted' ? 'accepted ✓' : 'declined';
+    addNotification('📅', response === 'accepted' ? '#d1fae5' : '#fee2e2', `Change request ${label}`, `Request for ${req.dates} was ${label}`);
+    showToast(`Request ${label}`);
+  }
+}
+
+function renderRequests() {
+  const list = document.getElementById('requestsList');
+  if (state.requests.length === 0) {
+    list.innerHTML = '<div class="empty-state" style="padding:24px 0;"><div class="empty-icon">✅</div><p>No schedule change requests</p></div>';
+    return;
+  }
+  list.innerHTML = state.requests.map(req => {
+    const fromName = req.from === 'A' ? state.parentAName : state.parentBName;
+    const isMe = req.from === state.currentParent;
+    const canRespond = !isMe && req.status === 'pending';
+    return `<div class="request-card ${req.status}">
+      <div class="req-status ${req.status}">${req.status.toUpperCase()}</div>
+      <div class="req-dates">📅 ${req.dates}</div>
+      <div class="req-reason">${fromName}: "${req.reason}"</div>
+      ${canRespond ? `<div class="req-actions">
+        <button class="btn-accept" onclick="respondToRequest(${req.id},'accepted')">✓ Accept</button>
+        <button class="btn-reject" onclick="respondToRequest(${req.id},'rejected')">✗ Decline</button>
+      </div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+// ══ NOTIFICATIONS ══
+function addNotification(icon, bg, title, sub) {
+  state.notifications.unshift({ icon, bg, title, sub, time: 'Just now', unread: true });
+  const badge = document.getElementById('notifBadge');
+  const count = state.notifications.filter(n => n.unread).length;
+  badge.textContent = count;
+  badge.style.display = count > 0 ? 'flex' : 'none';
+  renderNotifications();
+}
+
+function renderNotifications() {
+  const list = document.getElementById('notifList');
+  list.innerHTML = state.notifications.map(n => `
+    <div class="notif-item ${n.unread ? 'unread' : ''}">
+      <div class="notif-icon" style="background:${n.bg};">${n.icon}</div>
+      <div class="notif-body">
+        <div class="notif-title">${n.title}</div>
+        <div class="notif-sub">${n.sub}</div>
+        <div class="notif-time">${n.time}</div>
+      </div>
+    </div>`).join('');
+  const count = state.notifications.filter(n => n.unread).length;
+  const badge = document.getElementById('notifBadge');
+  badge.textContent = count;
+  badge.style.display = count > 0 ? 'flex' : 'none';
+}
+
+// ══ NAV ══
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById(`screen-${name}`).classList.add('active');
+  document.getElementById(`nav-${name}`).classList.add('active');
+
+  const compose = document.getElementById('composeBar');
+  if (compose) compose.style.display = name === 'messages' ? 'flex' : 'none';
+
+  if (name === 'notifications') {
+    state.notifications.forEach(n => n.unread = false);
+    renderNotifications();
+  }
+}
+
+// ══ MODAL ══
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(o => {
+  o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
+});
+
+// ══ TOAST ══
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ══ INIT ══
+// Hide compose bar initially
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    const compose = document.getElementById('composeBar');
+    if (compose) compose.style.display = 'none';
+  }, 100);
+});
+</script>
+</body>
+</html>
