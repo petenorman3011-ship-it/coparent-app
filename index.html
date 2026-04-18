@@ -221,6 +221,16 @@
     .tag-note { background: #f0fdf4; color: #166534; }
     .divider { height: 1px; background: var(--border); margin: 16px 0; }
 
+    /* ── SCHEDULE BUILDER ── */
+    .schedule-row { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+    .sched-day { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 4px; border-radius: 12px; border: 2px solid var(--border); cursor: pointer; transition: all 0.2s; background: #fff; }
+    .sched-day .day-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); }
+    .sched-day .day-who { font-size: 12px; font-weight: 700; }
+    .sched-day.assigned-a { background: var(--parent-a-light); border-color: var(--parent-a); }
+    .sched-day.assigned-a .day-who { color: var(--parent-a); }
+    .sched-day.assigned-b { background: var(--parent-b-light); border-color: var(--parent-b); }
+    .sched-day.assigned-b .day-who { color: var(--parent-b); }
+
     @media (min-width: 481px) {
       .app { border-left: 1px solid var(--border); border-right: 1px solid var(--border); box-shadow: 0 0 40px rgba(0,0,0,0.1); }
     }
@@ -391,6 +401,74 @@
       </div>
     </div>
 
+    <!-- ── SETTINGS ── -->
+    <div class="screen" id="screen-settings">
+      <div class="section-title-lg" style="margin-bottom:20px;">Settings</div>
+
+      <!-- Schedule Setup -->
+      <div class="card">
+        <div class="card-title">📅 Custody Schedule</div>
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">Set your fortnightly Week 1 / Week 2 arrangement. Tap each day to assign it to a parent.</p>
+
+        <div style="margin-bottom:20px;">
+          <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;">Week 1</div>
+          <div class="schedule-row" id="week1Row"></div>
+        </div>
+        <div style="margin-bottom:20px;">
+          <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;">Week 2</div>
+          <div class="schedule-row" id="week2Row"></div>
+        </div>
+
+        <div class="cal-legend" style="margin-bottom:16px;">
+          <div class="legend-item"><div class="legend-dot" style="background:var(--parent-a);"></div><span id="schLegendA">Parent A</span></div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--parent-b);"></div><span id="schLegendB">Parent B</span></div>
+        </div>
+        <button class="btn btn-primary" onclick="saveSchedule()">Save Schedule</button>
+      </div>
+
+      <!-- Child Profile -->
+      <div class="card">
+        <div class="card-title">👶 Child Profile</div>
+        <div class="form-group">
+          <label>Child's name</label>
+          <input type="text" id="settingsChildName" placeholder="Child's name"/>
+        </div>
+        <div class="form-group">
+          <label>Date of birth</label>
+          <input type="date" id="settingsChildDob"/>
+        </div>
+        <div class="form-group">
+          <label>Allergies / dietary needs</label>
+          <textarea id="settingsAllergies" rows="2" style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:12px;font-size:15px;font-family:'Inter',sans-serif;outline:none;resize:none;"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Doctor's name</label>
+          <input type="text" id="settingsDoctorName" placeholder="Dr. Smith"/>
+        </div>
+        <div class="form-group">
+          <label>Doctor's phone</label>
+          <input type="tel" id="settingsDoctorPhone" placeholder="01234 567890"/>
+        </div>
+        <div class="form-group">
+          <label>Emergency contact</label>
+          <input type="text" id="settingsEmergency" placeholder="Name and number"/>
+        </div>
+        <button class="btn btn-primary" onclick="saveChildProfile()">Save Profile</button>
+      </div>
+
+      <!-- Account -->
+      <div class="card">
+        <div class="card-title">👤 Your Account</div>
+        <div class="form-group">
+          <label>Your name</label>
+          <input type="text" id="settingsName" placeholder="Your name"/>
+        </div>
+        <div style="margin-top:16px;">
+          <button class="btn btn-secondary" onclick="signOut()">Sign Out</button>
+        </div>
+      </div>
+    </div>
+
     <!-- ── NOTIFICATIONS ── -->
     <div class="screen" id="screen-notifications">
       <div class="section-title-lg" style="margin-bottom:20px;">Notifications</div>
@@ -419,6 +497,10 @@
     <button class="nav-item" id="nav-calendar" onclick="showScreen('calendar')">
       <span class="nav-icon">📅</span>
       <span class="nav-label">Calendar</span>
+    </button>
+    <button class="nav-item" id="nav-settings" onclick="showScreen('settings')">
+      <span class="nav-icon">⚙️</span>
+      <span class="nav-label">Settings</span>
     </button>
     <button class="nav-item" id="nav-notifications" onclick="showScreen('notifications')">
       <span class="nav-badge">
@@ -549,22 +631,22 @@ let state = {
   calMonth: new Date().getMonth(),
   calYear: new Date().getFullYear(),
   selectedMood: '',
+  schedule: {
+    week1: { mon:'A', tue:'A', wed:'A', thu:'B', fri:'B', sat:'B', sun:'B' },
+    week2: { mon:'B', tue:'B', wed:'B', thu:'A', fri:'A', sat:'A', sun:'A' }
+  },
 };
 
-// ══ SCHEDULE — Week 1/Week 2 pattern ══
-// Week 1: Mon-Wed = Parent A, Thu-Sun = Parent B
-// Week 2: Mon-Wed = Parent B, Thu-Sun = Parent A
+// ══ SCHEDULE — uses custom Week 1/Week 2 pattern from state ══
+const JS_TO_KEY = ['sun','mon','tue','wed','thu','fri','sat'];
 function getParentForDate(date) {
-  const start = new Date(2026, 0, 5); // a known Monday for week 1
-  const diff = Math.floor((date - start) / (7 * 24 * 60 * 60 * 1000));
-  const weekNum = Math.floor(diff / 1) % 2;
-  const day = date.getDay(); // 0=Sun,1=Mon...6=Sat
-  const isWeek1 = (Math.floor((date - start) / (7 * 24 * 60 * 60 * 1000)) % 2 === 0);
-  if (isWeek1) {
-    return (day >= 1 && day <= 3) ? 'A' : 'B';
-  } else {
-    return (day >= 1 && day <= 3) ? 'B' : 'A';
-  }
+  if (!state.schedule) return 'A';
+  const start = new Date(2026, 0, 5); // known Week 1 Monday
+  const diffWeeks = Math.floor((date - start) / (7 * 24 * 60 * 60 * 1000));
+  const isWeek1 = (((diffWeeks % 2) + 2) % 2) === 0;
+  const pattern = isWeek1 ? state.schedule.week1 : state.schedule.week2;
+  const dayKey = JS_TO_KEY[date.getDay()];
+  return pattern[dayKey] || 'A';
 }
 
 // ══ AUTH ══
@@ -972,6 +1054,72 @@ function renderNotifications() {
   badge.style.display = count > 0 ? 'flex' : 'none';
 }
 
+// ══ SCHEDULE BUILDER ══
+const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const DAY_KEYS = ['mon','tue','wed','thu','fri','sat','sun'];
+
+// Default schedule stored in state
+if (!state.schedule) {
+  state.schedule = {
+    week1: { mon:'A', tue:'A', wed:'A', thu:'B', fri:'B', sat:'B', sun:'B' },
+    week2: { mon:'B', tue:'B', wed:'B', thu:'A', fri:'A', sat:'A', sun:'A' }
+  };
+}
+
+function renderScheduleBuilder() {
+  ['week1Row','week2Row'].forEach((rowId, wi) => {
+    const pattern = wi === 0 ? state.schedule.week1 : state.schedule.week2;
+    const row = document.getElementById(rowId);
+    if (!row) return;
+    row.innerHTML = DAY_KEYS.map((d, i) => {
+      const who = pattern[d];
+      const name = who === 'A' ? (state.parentAName || 'A') : (state.parentBName || 'B');
+      return `<div class="sched-day assigned-${who.toLowerCase()}" onclick="toggleScheduleDay(${wi},${i})">
+        <span class="day-label">${DAYS[i]}</span>
+        <span class="day-who">${name}</span>
+      </div>`;
+    }).join('');
+  });
+  const la = document.getElementById('schLegendA');
+  const lb = document.getElementById('schLegendB');
+  if (la) la.textContent = state.parentAName || 'Parent A';
+  if (lb) lb.textContent = state.parentBName || 'Parent B';
+}
+
+function toggleScheduleDay(weekIdx, dayIdx) {
+  const key = DAY_KEYS[dayIdx];
+  const pattern = weekIdx === 0 ? state.schedule.week1 : state.schedule.week2;
+  pattern[key] = pattern[key] === 'A' ? 'B' : 'A';
+  renderScheduleBuilder();
+}
+
+function saveSchedule() {
+  showToast('Schedule saved ✓');
+  renderCalendar();
+}
+
+function saveChildProfile() {
+  const n = document.getElementById('settingsChildName')?.value.trim();
+  if (n) state.childName = n;
+  showToast('Child profile saved ✓');
+  renderHome();
+}
+
+function signOut() {
+  document.getElementById('app').classList.remove('visible');
+  document.getElementById('authScreen').style.display = 'flex';
+  state.currentParent = null;
+}
+
+function initSettings() {
+  renderScheduleBuilder();
+  const name = state.currentParent === 'A' ? state.parentAName : state.parentBName;
+  const sn = document.getElementById('settingsName');
+  const sc = document.getElementById('settingsChildName');
+  if (sn) sn.value = name || '';
+  if (sc) sc.value = state.childName || '';
+}
+
 // ══ NAV ══
 function showScreen(name) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -985,6 +1133,9 @@ function showScreen(name) {
   if (name === 'notifications') {
     state.notifications.forEach(n => n.unread = false);
     renderNotifications();
+  }
+  if (name === 'settings') {
+    initSettings();
   }
 }
 
