@@ -467,6 +467,19 @@
         <button class="btn btn-primary" onclick="saveChildProfile()">Save Profile</button>
       </div>
 
+      <!-- Invite Partner -->
+      <div class="card" id="inviteCard">
+        <div class="card-title">👥 Invite Other Parent</div>
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">Share this invite code with the other parent so they can join and access the shared portal.</p>
+        <div style="background:var(--taupe-pale,#f8fafc);border:2px dashed var(--border);border-radius:12px;padding:20px;text-align:center;margin-bottom:16px;">
+          <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px;">Invite Code</div>
+          <div id="inviteCode" style="font-size:32px;font-weight:800;letter-spacing:6px;color:var(--teal,#0d9488);">BQ3DTO</div>
+        </div>
+        <button class="btn btn-primary" onclick="copyInviteCode()" style="margin-bottom:8px;">Copy Code</button>
+        <button class="btn btn-secondary" onclick="shareInviteCode()">Share via...</button>
+        <p style="font-size:12px;color:var(--text-muted);margin-top:12px;">The other parent creates their account and enters this code to join your family portal.</p>
+      </div>
+
       <!-- Account -->
       <div class="card">
         <div class="card-title">👤 Your Account</div>
@@ -1247,6 +1260,26 @@ function saveChildProfile() {
   if (n) state.childName = n;
   showToast('Child profile saved ✓');
   renderHome();
+}
+
+function copyInviteCode() {
+  const code = document.getElementById('inviteCode')?.textContent;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(code).then(() => showToast('Invite code copied ✓'));
+  } else {
+    showToast('Code: ' + code);
+  }
+}
+
+function shareInviteCode() {
+  const code = document.getElementById('inviteCode')?.textContent;
+  const text = `Join me on CoParent! Use invite code: ${code} to set up your account at https://petenorman3011-ship-it.github.io/coparent-app/`;
+  if (navigator.share) {
+    navigator.share({ title: 'CoParent Invite', text });
+  } else {
+    copyInviteCode();
+    showToast('Link copied ✓ — paste it to share');
+  }
 }
 
 function signOut() {
