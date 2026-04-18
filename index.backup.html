@@ -234,66 +234,6 @@
     @media (min-width: 481px) {
       .app { border-left: 1px solid var(--border); border-right: 1px solid var(--border); box-shadow: 0 0 40px rgba(0,0,0,0.1); }
     }
-
-    /* ── LIGHTBOX ── */
-    .lightbox-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 500; align-items: center; justify-content: center; cursor: pointer; }
-    .lightbox-overlay.open { display: flex; }
-    .lightbox-img { max-width: 95vw; max-height: 90vh; border-radius: 12px; object-fit: contain; }
-
-    /* ── PHOTO UPLOAD ── */
-    .photo-upload-btn { display: flex; align-items: center; gap: 8px; padding: 10px 16px; border: 2px dashed var(--border); border-radius: 12px; cursor: pointer; font-size: 14px; font-weight: 600; color: var(--text-muted); background: #f8fafc; transition: all 0.2s; width: 100%; }
-    .photo-upload-btn:hover { border-color: var(--teal); color: var(--teal); }
-    .photo-previews { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
-    .photo-thumb { width: 72px; height: 72px; border-radius: 10px; object-fit: cover; cursor: pointer; border: 2px solid var(--border); transition: transform 0.15s; }
-    .photo-thumb:hover { transform: scale(1.05); }
-    .log-photos { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-
-    /* ── FLAG BADGE ── */
-    .flag-badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 100px; font-size: 11px; font-weight: 700; margin-top: 6px; }
-    .flag-doctor { background: #dbeafe; color: #1e40af; }
-    .flag-difficult { background: #fef3c7; color: #92400e; }
-    .flag-unwell { background: #fee2e2; color: #991b1b; }
-    .flag-milestone { background: #fef9c3; color: #854d0e; }
-    .flag-other { background: #f3e8ff; color: #6b21a8; }
-    .log-card-milestone { border-color: #f59e0b !important; border-left-width: 4px !important; }
-    .flag-chips { display: flex; flex-wrap: wrap; gap: 6px; }
-    .flag-chip { padding: 7px 12px; border: 1.5px solid var(--border); border-radius: 100px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; background: #fff; }
-    .flag-chip.active-doctor { border-color: #3b82f6; background: #dbeafe; color: #1e40af; }
-    .flag-chip.active-difficult { border-color: #f59e0b; background: #fef3c7; color: #92400e; }
-    .flag-chip.active-unwell { border-color: #ef4444; background: #fee2e2; color: #991b1b; }
-    .flag-chip.active-milestone { border-color: #f59e0b; background: #fef9c3; color: #854d0e; }
-    .flag-chip.active-other { border-color: #8b5cf6; background: #f3e8ff; color: #6b21a8; }
-
-    /* ── MEDS SCREEN ── */
-    .med-card { background: var(--card); border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow); margin-bottom: 12px; border: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
-    .med-icon { width: 44px; height: 44px; border-radius: 12px; background: #dbeafe; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
-    .med-info { flex: 1; min-width: 0; }
-    .med-name { font-size: 15px; font-weight: 700; }
-    .med-detail { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
-    .med-actions { display: flex; gap: 6px; flex-shrink: 0; }
-    .dose-entry { display: flex; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); align-items: flex-start; }
-    .dose-entry:last-child { border-bottom: none; }
-    .dose-time-badge { font-size: 11px; font-weight: 700; color: var(--teal); min-width: 44px; background: var(--teal-light); border-radius: 6px; padding: 2px 6px; text-align: center; }
-    .dose-detail { font-size: 13px; flex: 1; }
-    .today-doses-card { background: linear-gradient(135deg, #dbeafe, #e0f2fe); border-radius: var(--radius); padding: 16px; margin-bottom: 16px; }
-
-    /* ── READ RECEIPT ── */
-    .seen-indicator { font-size: 11px; color: var(--teal); font-weight: 600; margin-top: 4px; }
-
-    /* ── INSIGHTS CARD ── */
-    .insights-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-    .insight-box { background: var(--bg); border-radius: 12px; padding: 12px 8px; text-align: center; }
-    .insight-val { font-size: 22px; font-weight: 800; color: var(--teal); }
-    .insight-lbl { font-size: 10px; color: var(--text-muted); margin-top: 2px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
-
-    /* ── HANDOVER BANNER ── */
-    .handover-banner { background: #fff7ed; border: 1.5px solid #fed7aa; border-radius: 12px; padding: 14px 16px; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
-    .handover-banner-text { flex: 1; font-size: 13px; font-weight: 600; color: #c2410c; }
-    .handover-banner-close { background: none; border: none; font-size: 18px; cursor: pointer; color: #9a3412; padding: 0; line-height: 1; }
-
-    /* ── MILESTONE FILTER ── */
-    .milestone-toggle { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border: 2px solid var(--border); border-radius: 100px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; background: #fff; color: var(--text-muted); margin-bottom: 12px; }
-    .milestone-toggle.active { border-color: #f59e0b; background: #fef9c3; color: #854d0e; }
   </style>
 </head>
 <body>
@@ -408,15 +348,6 @@
         </div>
       </div>
 
-      <div class="card" id="insightsCard">
-        <div class="card-title">📊 This Month</div>
-        <div class="insights-row" id="insightsRow">
-          <div class="insight-box"><div class="insight-val" id="insightLogs">0</div><div class="insight-lbl">Log entries</div></div>
-          <div class="insight-box"><div class="insight-val" id="insightMood">—</div><div class="insight-lbl">Top mood</div></div>
-          <div class="insight-box"><div class="insight-val" id="insightMsgs">0</div><div class="insight-lbl">Messages</div></div>
-        </div>
-      </div>
-
       <div class="card">
         <div class="card-title">📋 Recent Activity</div>
         <div id="recentActivity"></div>
@@ -439,12 +370,11 @@
       </div>
 
       <!-- Date filter + print -->
-      <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap;">
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap;">
         <input type="month" id="logMonthFilter" style="flex:1;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:'Inter',sans-serif;outline:none;" onchange="renderLog()"/>
         <button class="btn btn-secondary btn-sm" onclick="clearLogFilter()">All</button>
-        <button class="btn btn-secondary btn-sm" onclick="printMonthlyReport()">🖸 Print Report</button>
+        <button class="btn btn-secondary btn-sm" onclick="printMonthlyReport()">🖨 Print Report</button>
       </div>
-      <button class="milestone-toggle" id="milestoneToggle" onclick="toggleMilestoneFilter()">⭐ Milestones only</button>
 
       <div id="logFeed"></div>
 
@@ -454,12 +384,7 @@
 
     <!-- ── CALENDAR ── -->
     <div class="screen" id="screen-calendar">
-      <div class="section-title-lg" style="margin-bottom:16px;">Schedule</div>
-      <div class="handover-banner" id="handoverBanner" style="display:none;">
-        <span style="font-size:20px;">🔔</span>
-        <span class="handover-banner-text" id="handoverBannerText"></span>
-        <button class="handover-banner-close" onclick="document.getElementById('handoverBanner').style.display='none'">×</button>
-      </div>
+      <div class="section-title-lg" style="margin-bottom:20px;">Schedule</div>
 
       <div class="card">
         <div class="cal-header">
@@ -574,32 +499,6 @@
       <div id="notifList"></div>
     </div>
 
-    <!-- ── MEDS ── -->
-    <div class="screen" id="screen-meds">
-      <div class="section-header">
-        <div class="section-title-lg">💊 Medications</div>
-        <button class="btn btn-primary btn-sm" onclick="openAddMedModal()">+ Add Med</button>
-      </div>
-
-      <!-- Today's doses -->
-      <div class="today-doses-card" id="todayDosesCard">
-        <div class="card-title" style="margin-bottom:10px;">📌 Today’s doses</div>
-        <div id="todayDosesList"><div style="font-size:13px;color:var(--text-muted);">No doses logged today yet.</div></div>
-      </div>
-
-      <!-- Active medications -->
-      <div class="card">
-        <div class="card-title">📂 Active Medications</div>
-        <div id="medsList"></div>
-      </div>
-
-      <!-- Dose log -->
-      <div class="card">
-        <div class="card-title">📝 Dose History</div>
-        <div id="doseLogList"></div>
-      </div>
-    </div>
-
   </div>
 
   <!-- Bottom Nav -->
@@ -618,10 +517,6 @@
     <button class="nav-item" id="nav-log" onclick="showScreen('log')">
       <span class="nav-icon">📝</span>
       <span class="nav-label">Log</span>
-    </button>
-    <button class="nav-item" id="nav-meds" onclick="showScreen('meds')">
-      <span class="nav-icon">💊</span>
-      <span class="nav-label">Meds</span>
     </button>
     <button class="nav-item" id="nav-calendar" onclick="showScreen('calendar')">
       <span class="nav-icon">📅</span>
@@ -702,26 +597,6 @@
         <div class="log-section-title">📝 Notes</div>
         <textarea id="logNotes" placeholder="Anything else to share about today..." rows="3" style="width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:12px;font-size:15px;font-family:'Inter',sans-serif;outline:none;resize:none;"></textarea>
       </div>
-      <!-- Flag -->
-      <div class="log-section">
-        <div class="log-section-title">🚩 Flag this entry</div>
-        <div class="flag-chips">
-          <div class="flag-chip" data-flag="Doctor visit" onclick="toggleFlagChip(this)">🏥 Doctor visit</div>
-          <div class="flag-chip" data-flag="Difficult day" onclick="toggleFlagChip(this)">😓 Difficult day</div>
-          <div class="flag-chip" data-flag="Unwell" onclick="toggleFlagChip(this)">🤒 Unwell</div>
-          <div class="flag-chip" data-flag="Milestone" onclick="toggleFlagChip(this)">⭐ Milestone</div>
-          <div class="flag-chip" data-flag="Other" onclick="toggleFlagChip(this)">📌 Other</div>
-        </div>
-      </div>
-      <!-- Photos -->
-      <div class="log-section">
-        <div class="log-section-title">📷 Photos</div>
-        <label class="photo-upload-btn" for="photoInput">
-          <span style="font-size:20px;">📸</span> Add photos
-        </label>
-        <input type="file" id="photoInput" accept="image/*" multiple style="display:none;" onchange="handlePhotoUpload(event)"/>
-        <div class="photo-previews" id="photoPreviewArea"></div>
-      </div>
       <button class="btn btn-primary" onclick="saveLog()" style="margin-top:8px;">Save Entry</button>
       <button class="btn btn-secondary" onclick="closeModal('logModal')" style="margin-top:8px;">Cancel</button>
     </div>
@@ -746,81 +621,10 @@
   </div>
 </div>
 
-<!-- Lightbox -->
-<div class="lightbox-overlay" id="lightbox" onclick="closeLightbox()">
-  <img class="lightbox-img" id="lightboxImg" src="" alt="Photo"/>
-</div>
-
-<!-- Add Medication Modal -->
-<div class="modal-overlay" id="addMedModal">
-  <div class="modal">
-    <div class="modal-handle"></div>
-    <div class="modal-title">💊 Add Medication</div>
-    <div class="form-group">
-      <label>Medication name</label>
-      <input type="text" id="medName" placeholder="e.g. Amoxicillin"/>
-    </div>
-    <div class="form-group">
-      <label>Dosage</label>
-      <input type="text" id="medDosage" placeholder="e.g. 250mg"/>
-    </div>
-    <div class="form-group">
-      <label>Frequency</label>
-      <input type="text" id="medFreq" placeholder="e.g. Twice daily"/>
-    </div>
-    <div class="form-group">
-      <label>Notes (optional)</label>
-      <textarea id="medNotes" rows="2" placeholder="e.g. With food, prescribed by Dr Smith" style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:12px;font-size:15px;font-family:'Inter',sans-serif;outline:none;resize:none;"></textarea>
-    </div>
-    <button class="btn btn-primary" onclick="saveMedication()" style="margin-bottom:8px;">Add Medication</button>
-    <button class="btn btn-secondary" onclick="closeModal('addMedModal')">Cancel</button>
-  </div>
-</div>
-
-<!-- Log Dose Modal -->
-<div class="modal-overlay" id="logDoseModal">
-  <div class="modal">
-    <div class="modal-handle"></div>
-    <div class="modal-title">📝 Log Dose</div>
-    <input type="hidden" id="logDoseMedId"/>
-    <div class="form-group">
-      <label>Time given</label>
-      <input type="time" id="doseTime"/>
-    </div>
-    <div class="form-group">
-      <label>Dose given</label>
-      <input type="text" id="doseAmount" placeholder="e.g. 5ml or 1 tablet"/>
-    </div>
-    <div class="form-group">
-      <label>Notes (optional)</label>
-      <input type="text" id="doseNotes" placeholder="Any reactions, notes..."/>
-    </div>
-    <button class="btn btn-primary" onclick="saveDose()" style="margin-bottom:8px;">Log Dose</button>
-    <button class="btn btn-secondary" onclick="closeModal('logDoseModal')">Cancel</button>
-  </div>
-</div>
-
 <!-- Toast -->
 <div class="toast" id="toast"></div>
 
 <script>
-// ══ BACKEND CONFIG ══
-const CONFIG = { apiBase: '', useBackend: false };
-
-async function fetchAPI(endpoint, method = 'GET', body = null) {
-  if (!CONFIG.useBackend) return null;
-  const opts = { method, headers: { 'Content-Type': 'application/json' } };
-  if (body) opts.body = JSON.stringify(body);
-  try {
-    const res = await fetch(CONFIG.apiBase + endpoint, opts);
-    if (!res.ok) throw new Error(`API ${res.status}`);
-    return await res.json();
-  } catch (e) {
-    console.warn('fetchAPI error:', e);
-    return null;
-  }
-}
-
 // ══ STATE ══
 let state = {
   currentParent: null,
@@ -851,12 +655,6 @@ let state = {
   calMonth: new Date().getMonth(),
   calYear: new Date().getFullYear(),
   selectedMood: '',
-  selectedFlag: null,
-  pendingPhotos: [],
-  milestoneFilterActive: false,
-  logReads: {},
-  meds: [],
-  doses: [],
   schedule: {
     week1: { mon:'A', tue:'A', wed:'A', thu:'B', fri:'B', sat:'B', sun:'B' },
     week2: { mon:'B', tue:'B', wed:'B', thu:'A', fri:'A', sat:'A', sun:'A' }
@@ -937,7 +735,6 @@ function initApp() {
   renderCalendar();
   renderRequests();
   renderNotifications();
-  renderMeds();
   updateLegend();
 }
 
@@ -969,9 +766,6 @@ function renderHome() {
   const nextName = getParentForDate(next) === 'A' ? state.parentAName : state.parentBName;
   document.getElementById('todayHandover').textContent = `Next handover: ${next.toLocaleDateString('en-GB', {weekday:'short',day:'numeric',month:'short'})} → ${nextName}`;
 
-  // Monthly insights
-  renderInsights();
-
   // Recent activity
   const ra = document.getElementById('recentActivity');
   if (state.logs.length === 0) {
@@ -990,29 +784,6 @@ function renderHome() {
       </div>
     </div>`;
   }).join('');
-}
-
-// ══ INSIGHTS ══
-function renderInsights() {
-  const now = new Date();
-  const ym = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
-  const monthLogs = state.logs.filter(l => (l.logDate || l.date || '').startsWith(ym));
-  const monthMsgs = state.messages.filter(m => {
-    // count messages by current parent this month (approximate)
-    return m.from === state.currentParent;
-  }).length;
-  // Most common mood
-  const moodCounts = {};
-  monthLogs.forEach(l => { if (l.mood) moodCounts[l.mood] = (moodCounts[l.mood]||0)+1; });
-  let topMood = '—';
-  let maxCount = 0;
-  Object.entries(moodCounts).forEach(([m,c]) => { if (c > maxCount) { maxCount = c; topMood = m; } });
-  const elLogs = document.getElementById('insightLogs');
-  const elMood = document.getElementById('insightMood');
-  const elMsgs = document.getElementById('insightMsgs');
-  if (elLogs) elLogs.textContent = monthLogs.length;
-  if (elMood) elMood.textContent = topMood;
-  if (elMsgs) elMsgs.textContent = monthMsgs;
 }
 
 // ══ MESSAGES ══
@@ -1073,17 +844,13 @@ function sendMessage() {
     const list = document.getElementById('messagesList');
     const suggestion = getSuggestion(text);
     const warningId = 'warn_' + Date.now();
-    window._modSuggestions = window._modSuggestions || {};
-    window._modSuggestions[warningId] = suggestion;
-    const safeText = text.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
     const warningHtml = `<div class="moderation-warning" id="${warningId}">
-      <div class="mod-title">&#x26A0;&#xFE0F; Message flagged</div>
+      <div class="mod-title">⚠️ Message flagged</div>
       <div class="mod-text">This message may contain language that could escalate conflict. For ${state.childName}'s benefit, please consider rewording it calmly.</div>
-      <div class="mod-suggestion">&#x1F4A1; ${suggestion}</div>
-      <div class="mod-actions" style="flex-wrap:wrap;gap:6px;">
+      <div class="mod-suggestion">💡 ${suggestion}</div>
+      <div class="mod-actions">
         <button class="btn btn-secondary btn-sm" onclick="document.getElementById('${warningId}').remove();">Edit message</button>
-        <button class="btn btn-sm" style="background:#d1fae5;color:#065f46;" onclick="useRewrite('${warningId}')">&#x2728; Use suggested rewrite</button>
-        <button class="btn btn-sm" style="background:#fee2e2;color:#991b1b;" onclick="forceSend('${safeText}','${warningId}')">Send anyway</button>
+        <button class="btn btn-sm" style="background:#fee2e2;color:#991b1b;" onclick="forceSend('${text.replace(/'/g,"\\'")}','${warningId}')">Send anyway</button>
       </div>
     </div>`;
     list.insertAdjacentHTML('beforeend', warningHtml);
@@ -1095,20 +862,6 @@ function sendMessage() {
   input.value = '';
   input.style.height = 'auto';
 }
-
-function useRewrite(warningId) {
-  const suggestion = (window._modSuggestions || {})[warningId] || '';
-  let rewrite = suggestion.replace(/^Try:\s*[\u201c\u201d\u0022]?/, '').replace(/[\u201c\u201d\u0022]?\s*\u2014.*$/, '').trim();
-  if (!rewrite || rewrite.length < 5) rewrite = suggestion;
-  const input = document.getElementById('msgInput');
-  if (input) {
-    input.value = rewrite;
-    input.focus();
-    autoResize(input);
-  }
-  document.getElementById(warningId)?.remove();
-}
-
 
 function forceSend(text, warningId) {
   document.getElementById(warningId)?.remove();
@@ -1134,45 +887,7 @@ function selectMood(el, emoji) {
   state.selectedMood = emoji;
 }
 
-function toggleFlagChip(el) {
-  const flag = el.dataset.flag;
-  const flagKey = flag.toLowerCase().replace(' ', '-');
-  if (state.selectedFlag === flag) {
-    state.selectedFlag = null;
-    el.className = 'flag-chip';
-  } else {
-    // Deselect all
-    document.querySelectorAll('.flag-chip').forEach(f => f.className = 'flag-chip');
-    state.selectedFlag = flag;
-    el.className = `flag-chip active-${flagKey}`;
-  }
-}
-
-function handlePhotoUpload(event) {
-  const files = Array.from(event.target.files);
-  const preview = document.getElementById('photoPreviewArea');
-  files.forEach(file => {
-    const reader = new FileReader();
-    reader.onload = e => {
-      const base64 = e.target.result;
-      state.pendingPhotos.push(base64);
-      const img = document.createElement('img');
-      img.src = base64;
-      img.className = 'photo-thumb';
-      img.onclick = () => openLightbox(base64);
-      preview.appendChild(img);
-    };
-    reader.readAsDataURL(file);
-  });
-  event.target.value = ''; // Allow re-uploading same file
-}
-
-function openLogModal() {
-  state.pendingPhotos = [];
-  const preview = document.getElementById('photoPreviewArea');
-  if (preview) preview.innerHTML = '';
-  document.getElementById('logModal').classList.add('open');
-}
+function openLogModal() { document.getElementById('logModal').classList.add('open'); }
 
 function saveLog() {
   const chips = [...document.querySelectorAll('#mealChips .chip.selected')].map(c => c.textContent);
@@ -1180,27 +895,20 @@ function saveLog() {
   const napEnd = document.getElementById('napEnd').value;
   const notes = document.getElementById('logNotes').value.trim();
   const now = new Date();
-  const todayStr = now.toISOString().split('T')[0];
 
   const entry = {
     id: Date.now(),
     parent: state.currentParent,
     time: now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }),
     date: 'Today',
-    logDate: todayStr,
     meals: chips.filter((_,i) => i < 4),
     drinks: chips.filter((_,i) => i >= 4),
     nap: napStart && napEnd ? `${napStart}–${napEnd}` : null,
     mood: state.selectedMood,
     notes,
-    flag: state.selectedFlag || null,
-    photos: [...state.pendingPhotos],
   };
 
   state.logs.unshift(entry);
-  // Mark as read by current parent
-  state.logReads[entry.id] = true;
-
   closeModal('logModal');
   renderLog();
   renderHome();
@@ -1210,36 +918,19 @@ function saveLog() {
   // Reset form
   document.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
   document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
-  document.querySelectorAll('.flag-chip').forEach(c => c.className = 'flag-chip');
   document.getElementById('napStart').value = '';
   document.getElementById('napEnd').value = '';
   document.getElementById('logNotes').value = '';
   state.selectedMood = '';
-  state.selectedFlag = null;
-  state.pendingPhotos = [];
 }
-
-function toggleMilestoneFilter() {
-  state.milestoneFilterActive = !state.milestoneFilterActive;
-  const btn = document.getElementById('milestoneToggle');
-  if (btn) btn.classList.toggle('active', state.milestoneFilterActive);
-  renderLog();
-}
-
-const FLAG_STYLES = {
-  'Doctor visit': { cls: 'flag-doctor', icon: '🏥' },
-  'Difficult day': { cls: 'flag-difficult', icon: '😓' },
-  'Unwell':        { cls: 'flag-unwell',   icon: '🤒' },
-  'Milestone':     { cls: 'flag-milestone', icon: '⭐' },
-  'Other':         { cls: 'flag-other',    icon: '📌' },
-};
 
 function renderLog() {
   const feed = document.getElementById('logFeed');
-  const monthFilter = document.getElementById('logMonthFilter')?.value;
+  const monthFilter = document.getElementById('logMonthFilter')?.value; // e.g. '2026-04'
 
   let logs = [...state.logs];
 
+  // Filter by selected month if set
   if (monthFilter) {
     logs = logs.filter(log => {
       const d = log.logDate || log.date;
@@ -1247,11 +938,7 @@ function renderLog() {
     });
   }
 
-  // Milestone filter
-  if (state.milestoneFilterActive) {
-    logs = logs.filter(log => log.flag === 'Milestone');
-  }
-
+  // Sort newest first
   logs.sort((a, b) => {
     const da = a.logDate || a.date || '';
     const db = b.logDate || b.date || '';
@@ -1259,10 +946,11 @@ function renderLog() {
   });
 
   if (logs.length === 0) {
-    feed.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><p>${state.milestoneFilterActive ? 'No milestone entries yet.' : monthFilter ? 'No entries for this month.' : 'No log entries yet.'}<br/><span style="font-size:13px;">Add the first one!</span></p></div>`;
+    feed.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><p>${monthFilter ? 'No entries for this month.' : 'No log entries yet.'}<br/><span style="font-size:13px;">Add the first one!</span></p></div>`;
     return;
   }
 
+  // Group by date
   const grouped = {};
   logs.forEach(log => {
     const key = log.logDate || log.date || 'Unknown';
@@ -1275,39 +963,19 @@ function renderLog() {
     const entries = grouped[dateKey].map(log => {
       const pName = log.parent === 'A' ? state.parentAName : state.parentBName;
       const pColor = log.parent === 'A' ? 'var(--parent-a)' : 'var(--parent-b)';
-      const isMilestone = log.flag === 'Milestone';
-      const flagInfo = log.flag ? FLAG_STYLES[log.flag] : null;
-      const borderStyle = isMilestone
-        ? 'border:3px solid #f59e0b;'
-        : `border-left:4px solid ${pColor};`;
-      const isMe = log.parent === state.currentParent;
-      const isSeen = state.logReads[log.id];
-      // Mark as seen if not my entry and viewing
-      if (!isMe) state.logReads[log.id] = true;
-      const photosHtml = log.photos?.length
-        ? `<div class="log-photos">${log.photos.map(p => `<img src="${p}" class="photo-thumb" onclick="openLightbox('${p.substring(0,50)}')" style="width:64px;height:64px;"/>`).join('')}</div>`
-        : '';
-      // Fix photo onclick for full base64
-      const safePhotos = log.photos?.length
-        ? `<div class="log-photos">${log.photos.map((p,pi) => `<img src="${p}" class="photo-thumb" onclick="openLightboxById(${log.id},${pi})" style="width:64px;height:64px;"/>`).join('')}</div>`
-        : '';
-      return `<div class="card ${isMilestone ? 'log-card-milestone' : ''}" style="${borderStyle}margin-bottom:10px;">
+      return `<div class="card" style="border-left:4px solid ${pColor};margin-bottom:10px;">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
           <div class="avatar avatar-${log.parent.toLowerCase()}" style="width:30px;height:30px;font-size:12px;">${pName[0]}</div>
           <div>
-            <div style="font-size:13px;font-weight:700;">${isMilestone ? '⭐ ' : ''}${pName}</div>
+            <div style="font-size:13px;font-weight:700;">${pName}</div>
             <div style="font-size:11px;color:var(--text-muted);">${log.time || ''}</div>
           </div>
           ${log.mood ? `<span style="font-size:22px;margin-left:auto;">${log.mood}</span>` : ''}
         </div>
-        ${flagInfo ? `<span class="flag-badge ${flagInfo.cls}">${flagInfo.icon} ${log.flag}</span>` : ''}
         ${log.meals?.length ? `<div style="margin-bottom:6px;"><span class="tag-pill tag-meal">🍽 ${log.meals.join(' · ')}</span></div>` : ''}
         ${log.drinks?.length ? `<div style="margin-bottom:6px;"><span class="tag-pill" style="background:#e0f2fe;color:#0369a1;">💧 ${log.drinks.join(' · ')}</span></div>` : ''}
         ${log.nap ? `<div style="margin-bottom:6px;"><span class="tag-pill tag-nap">😴 Nap: ${log.nap}</span></div>` : ''}
         ${log.notes ? `<div style="font-size:14px;color:var(--text);margin-top:8px;line-height:1.6;">${log.notes}</div>` : ''}
-        ${safePhotos}
-        ${isMe && isSeen ? `<div class="seen-indicator">✓ Seen by other parent</div>` : ''}
-        ${isMe && !isSeen ? `<div class="seen-indicator" style="color:var(--text-muted);">Delivered</div>` : ''}
       </div>`;
     }).join('');
     return `<div style="margin-bottom:20px;">
@@ -1315,23 +983,6 @@ function renderLog() {
       ${entries}
     </div>`;
   }).join('');
-}
-
-function openLightbox(src) {
-  document.getElementById('lightboxImg').src = src;
-  document.getElementById('lightbox').classList.add('open');
-}
-
-function openLightboxById(logId, photoIdx) {
-  const log = state.logs.find(l => l.id === logId);
-  if (log && log.photos && log.photos[photoIdx]) {
-    openLightbox(log.photos[photoIdx]);
-  }
-}
-
-function closeLightbox() {
-  document.getElementById('lightbox').classList.remove('open');
-  document.getElementById('lightboxImg').src = '';
 }
 
 function formatDateLabel(dateStr) {
@@ -1353,9 +1004,6 @@ function clearLogFilter() {
 }
 
 function printMonthlyReport() {
-  // Court export checkbox
-  const courtExport = confirm('Export as court-admissible document?\n\nOK = Court-admissible format (formal header, exact timestamps, tamper-evident footer)\nCancel = Standard format');
-
   const monthFilter = document.getElementById('logMonthFilter')?.value;
   const monthLabel = monthFilter
     ? new Date(monthFilter + '-01').toLocaleDateString('en-GB', { month:'long', year:'numeric' })
@@ -1383,14 +1031,10 @@ function printMonthlyReport() {
       if (log.drinks?.length) parts.push(`Drinks: ${log.drinks.join(', ')}`);
       if (log.nap) parts.push(`Nap: ${log.nap}`);
       if (log.mood) parts.push(`Mood: ${log.mood}`);
-      if (log.flag) parts.push(`Flag: ${log.flag}`);
       if (log.notes) parts.push(`Notes: ${log.notes}`);
-      const timeDisplay = courtExport
-        ? `${log.logDate || log.date || ''} ${log.time || ''} (exact)`
-        : (log.time || '');
       return `<tr>
         <td style="padding:8px 12px;border:1px solid #ddd;font-weight:600;white-space:nowrap;">${pName}</td>
-        <td style="padding:8px 12px;border:1px solid #ddd;white-space:nowrap;">${timeDisplay}</td>
+        <td style="padding:8px 12px;border:1px solid #ddd;">${log.time || ''}</td>
         <td style="padding:8px 12px;border:1px solid #ddd;">${parts.join(' | ')}</td>
       </tr>`;
     }).join('');
@@ -1402,30 +1046,9 @@ function printMonthlyReport() {
   const parentA = state.parentAName || 'Parent A';
   const parentB = state.parentBName || 'Parent B';
   const child = state.childName || 'Child';
-  const generatedAt = new Date().toISOString();
-  const generatedDisplay = new Date().toLocaleString('en-GB', {day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'});
-
-  const courtHeader = courtExport ? `
-    <div style="border:2px solid #000;padding:16px;margin-bottom:24px;background:#f9f9f9;">
-      <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;">OFFICIAL RECORD — CO-PARENTING LOG</div>
-      <div style="font-size:13px;">This document is an official record exported from CoParent. All entries are recorded as submitted by the named parents. This document has not been altered after export.</div>
-      <div style="margin-top:8px;font-size:12px;">Export timestamp: <strong>${generatedAt}</strong></div>
-    </div>` : '';
-
-  const courtFooter = courtExport ? `
-    <div style="margin-top:32px;padding:16px;border:1px solid #000;font-size:11px;background:#f9f9f9;">
-      <strong>TAMPER-EVIDENT FOOTER</strong><br/>
-      Document exported: ${generatedAt}<br/>
-      Child: ${child} | Parents: ${parentA} &amp; ${parentB}<br/>
-      Period: ${monthLabel} | Total entries: ${logs.length}<br/>
-      This record is provided for legal and co-parenting purposes. Any modification to this document after export invalidates its integrity.
-    </div>` : `
-    <div style="margin-top:32px;font-size:11px;color:#aaa;border-top:1px solid #eee;padding-top:16px;">
-      Generated by CoParent &mdash; ${generatedDisplay}
-    </div>`;
 
   const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"/>
-    <title>${courtExport ? 'OFFICIAL RECORD ' : ''}CoParent Log Report — ${monthLabel}</title>
+    <title>CoParent Log Report — ${monthLabel}</title>
     <style>
       body { font-family: Arial, sans-serif; padding: 32px; color: #111; }
       h1 { font-size: 24px; margin-bottom: 4px; }
@@ -1435,8 +1058,7 @@ function printMonthlyReport() {
       @media print { button { display: none; } }
     </style>
   </head><body>
-    ${courtHeader}
-    <h1>${courtExport ? '⚖️ OFFICIAL: ' : '🤝 '} CoParent — Daily Log Report</h1>
+    <h1>🤝 CoParent — Daily Log Report</h1>
     <div class="meta">
       Child: <strong>${child}</strong> &nbsp;·&nbsp;
       Period: <strong>${monthLabel}</strong> &nbsp;·&nbsp;
@@ -1445,12 +1067,14 @@ function printMonthlyReport() {
     <table>
       <thead><tr>
         <th style="width:120px;">Parent</th>
-        <th style="width:${courtExport ? '160' : '80'}px;">Time</th>
+        <th style="width:80px;">Time</th>
         <th>Details</th>
       </tr></thead>
       <tbody>${rows}</tbody>
     </table>
-    ${courtFooter}
+    <div style="margin-top:32px;font-size:11px;color:#aaa;border-top:1px solid #eee;padding-top:16px;">
+      Generated by CoParent &mdash; ${new Date().toLocaleDateString('en-GB', {day:'numeric',month:'long',year:'numeric'})}
+    </div>
     <script>window.onload = function() { window.print(); }<\/script>
   </body></html>`;
 
@@ -1484,33 +1108,6 @@ function renderCalendar() {
   }
 
   document.getElementById('calGrid').innerHTML = html;
-
-  // Handover banner
-  checkHandoverBanner();
-}
-
-function checkHandoverBanner() {
-  const banner = document.getElementById('handoverBanner');
-  const bannerText = document.getElementById('handoverBannerText');
-  if (!banner || !bannerText) return;
-  const today = new Date();
-  const todayParent = getParentForDate(today);
-  let next = new Date(today);
-  next.setDate(next.getDate() + 1);
-  let days = 1;
-  while (getParentForDate(next) === todayParent && days < 14) {
-    next.setDate(next.getDate() + 1); days++;
-  }
-  const hoursUntil = (next - today) / (1000 * 60 * 60);
-  if (hoursUntil <= 48) {
-    const nextName = getParentForDate(next) === 'A' ? state.parentAName : state.parentBName;
-    const dateStr = next.toLocaleDateString('en-GB', { weekday:'short', day:'numeric', month:'short' });
-    const hrsDisplay = hoursUntil < 24 ? `${Math.round(hoursUntil)} hours` : `${Math.round(hoursUntil/24)} day${Math.round(hoursUntil/24) !== 1 ? 's' : ''}`;
-    bannerText.textContent = `Handover in ${hrsDisplay} (${dateStr}) → ${nextName}`;
-    banner.style.display = 'flex';
-  } else {
-    banner.style.display = 'none';
-  }
 }
 
 function prevMonth() {
@@ -1717,12 +1314,6 @@ function showScreen(name) {
   if (name === 'settings') {
     initSettings();
   }
-  if (name === 'meds') {
-    renderMeds();
-  }
-  if (name === 'calendar') {
-    checkHandoverBanner();
-  }
 }
 
 // ══ MODAL ══
@@ -1737,113 +1328,6 @@ function showToast(msg) {
   t.textContent = msg;
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2500);
-}
-
-// ══ MEDS ══
-function openAddMedModal() {
-  document.getElementById('medName').value = '';
-  document.getElementById('medDosage').value = '';
-  document.getElementById('medFreq').value = '';
-  document.getElementById('medNotes').value = '';
-  document.getElementById('addMedModal').classList.add('open');
-}
-
-function saveMedication() {
-  const name = document.getElementById('medName').value.trim();
-  const dosage = document.getElementById('medDosage').value.trim();
-  const freq = document.getElementById('medFreq').value.trim();
-  const notes = document.getElementById('medNotes').value.trim();
-  if (!name) { showToast('Please enter a medication name'); return; }
-  state.meds.push({ id: Date.now(), name, dosage, freq, notes, addedBy: state.currentParent, active: true });
-  closeModal('addMedModal');
-  renderMeds();
-  showToast(`${name} added ✓`);
-}
-
-function openLogDoseModal(medId) {
-  document.getElementById('logDoseMedId').value = medId;
-  const now = new Date();
-  document.getElementById('doseTime').value = now.toTimeString().slice(0,5);
-  document.getElementById('doseAmount').value = '';
-  document.getElementById('doseNotes').value = '';
-  document.getElementById('logDoseModal').classList.add('open');
-}
-
-function saveDose() {
-  const medId = parseInt(document.getElementById('logDoseMedId').value);
-  const time = document.getElementById('doseTime').value;
-  const amount = document.getElementById('doseAmount').value.trim();
-  const notes = document.getElementById('doseNotes').value.trim();
-  if (!time) { showToast('Please enter the time given'); return; }
-  const med = state.meds.find(m => m.id === medId);
-  const today = new Date().toISOString().split('T')[0];
-  state.doses.push({ id: Date.now(), medId, medName: med?.name || 'Unknown', time, amount, notes, givenBy: state.currentParent, date: today });
-  closeModal('logDoseModal');
-  renderMeds();
-  showToast('Dose logged ✓');
-}
-
-function renderMeds() {
-  const medsList = document.getElementById('medsList');
-  const doseLogList = document.getElementById('doseLogList');
-  const todayDosesList = document.getElementById('todayDosesList');
-  if (!medsList) return;
-
-  const today = new Date().toISOString().split('T')[0];
-  const todayDoses = state.doses.filter(d => d.date === today);
-
-  // Today's doses
-  if (todayDoses.length === 0) {
-    todayDosesList.innerHTML = '<div style="font-size:13px;color:var(--text-muted);">No doses logged today yet.</div>';
-  } else {
-    todayDosesList.innerHTML = todayDoses.map(dose => {
-      const pName = dose.givenBy === 'A' ? state.parentAName : state.parentBName;
-      return `<div class="dose-entry">
-        <span class="dose-time-badge">${dose.time}</span>
-        <div class="dose-detail">
-          <strong>${dose.medName}</strong>${dose.amount ? ` — ${dose.amount}` : ''}
-          <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Given by ${pName}${dose.notes ? ' · ' + dose.notes : ''}</div>
-        </div>
-      </div>`;
-    }).join('');
-  }
-
-  // Active medications list
-  if (state.meds.length === 0) {
-    medsList.innerHTML = '<div class="empty-state" style="padding:20px 0;"><div class="empty-icon">💊</div><p>No medications added yet</p></div>';
-  } else {
-    medsList.innerHTML = state.meds.filter(m => m.active).map(med => {
-      const pName = med.addedBy === 'A' ? state.parentAName : state.parentBName;
-      return `<div class="med-card">
-        <div class="med-icon">💊</div>
-        <div class="med-info">
-          <div class="med-name">${med.name}</div>
-          <div class="med-detail">${med.dosage ? med.dosage + ' · ' : ''}${med.freq || 'As needed'}</div>
-          ${med.notes ? `<div style="font-size:11px;color:var(--text-muted);margin-top:2px;">${med.notes}</div>` : ''}
-        </div>
-        <div class="med-actions">
-          <button class="btn btn-primary btn-sm" onclick="openLogDoseModal(${med.id})">Log dose</button>
-        </div>
-      </div>`;
-    }).join('');
-  }
-
-  // Full dose history
-  if (state.doses.length === 0) {
-    doseLogList.innerHTML = '<div style="font-size:13px;color:var(--text-muted);padding:12px 0;">No doses logged yet.</div>';
-  } else {
-    const sorted = [...state.doses].sort((a,b) => (b.date+b.time).localeCompare(a.date+a.time));
-    doseLogList.innerHTML = sorted.map(dose => {
-      const pName = dose.givenBy === 'A' ? state.parentAName : state.parentBName;
-      return `<div class="dose-entry">
-        <span class="dose-time-badge">${dose.time}</span>
-        <div class="dose-detail">
-          <strong>${dose.medName}</strong>${dose.amount ? ` — ${dose.amount}` : ''}
-          <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">${dose.date} · ${pName}${dose.notes ? ' · ' + dose.notes : ''}</div>
-        </div>
-      </div>`;
-    }).join('');
-  }
 }
 
 // ══ INIT ══
