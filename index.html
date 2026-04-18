@@ -368,7 +368,18 @@
         <div class="section-title-lg">Daily Log</div>
         <button class="btn btn-primary btn-sm" onclick="openLogModal()">+ Add Entry</button>
       </div>
+
+      <!-- Date filter + print -->
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap;">
+        <input type="month" id="logMonthFilter" style="flex:1;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;font-family:'Inter',sans-serif;outline:none;" onchange="renderLog()"/>
+        <button class="btn btn-secondary btn-sm" onclick="clearLogFilter()">All</button>
+        <button class="btn btn-secondary btn-sm" onclick="printMonthlyReport()">🖨 Print Report</button>
+      </div>
+
       <div id="logFeed"></div>
+
+      <!-- Printable report area (hidden on screen) -->
+      <div id="printReport" style="display:none;"></div>
     </div>
 
     <!-- ── CALENDAR ── -->
@@ -902,28 +913,161 @@ function saveLog() {
 
 function renderLog() {
   const feed = document.getElementById('logFeed');
-  if (state.logs.length === 0) {
-    feed.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div><p>No log entries yet.<br/>Add the first one!</p></div>';
+  const monthFilter = document.getElementById('logMonthFilter')?.value; // e.g. '2026-04'
+
+  let logs = [...state.logs];
+
+  // Filter by selected month if set
+  if (monthFilter) {
+    logs = logs.filter(log => {
+      const d = log.logDate || log.date;
+      return d && d.startsWith(monthFilter);
+    });
+  }
+
+  // Sort newest first
+  logs.sort((a, b) => {
+    const da = a.logDate || a.date || '';
+    const db = b.logDate || b.date || '';
+    return db.localeCompare(da);
+  });
+
+  if (logs.length === 0) {
+    feed.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><p>${monthFilter ? 'No entries for this month.' : 'No log entries yet.'}<br/><span style="font-size:13px;">Add the first one!</span></p></div>`;
     return;
   }
-  feed.innerHTML = state.logs.map(log => {
-    const pName = log.parent === 'A' ? state.parentAName : state.parentBName;
-    const pColor = log.parent === 'A' ? 'var(--parent-a)' : 'var(--parent-b)';
-    return `<div class="card" style="border-left: 4px solid ${pColor};">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-        <div class="avatar avatar-${log.parent.toLowerCase()}" style="width:32px;height:32px;font-size:13px;">${pName[0]}</div>
-        <div>
-          <div style="font-size:13px;font-weight:700;">${pName}</div>
-          <div style="font-size:11px;color:var(--text-muted);">${log.date} · ${log.time}</div>
+
+  // Group by date
+  const grouped = {};
+  logs.forEach(log => {
+    const key = log.logDate || log.date || 'Unknown';
+    if (!grouped[key]) grouped[key] = [];
+    grouped[key].push(log);
+  });
+
+  feed.innerHTML = Object.keys(grouped).sort((a,b) => b.localeCompare(a)).map(dateKey => {
+    const dateLabel = formatDateLabel(dateKey);
+    const entries = grouped[dateKey].map(log => {
+      const pName = log.parent === 'A' ? state.parentAName : state.parentBName;
+      const pColor = log.parent === 'A' ? 'var(--parent-a)' : 'var(--parent-b)';
+      return `<div class="card" style="border-left:4px solid ${pColor};margin-bottom:10px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+          <div class="avatar avatar-${log.parent.toLowerCase()}" style="width:30px;height:30px;font-size:12px;">${pName[0]}</div>
+          <div>
+            <div style="font-size:13px;font-weight:700;">${pName}</div>
+            <div style="font-size:11px;color:var(--text-muted);">${log.time || ''}</div>
+          </div>
+          ${log.mood ? `<span style="font-size:22px;margin-left:auto;">${log.mood}</span>` : ''}
         </div>
-        ${log.mood ? `<span style="font-size:24px;margin-left:auto;">${log.mood}</span>` : ''}
-      </div>
-      ${log.meals?.length ? `<div style="margin-bottom:8px;"><span class="tag-pill tag-meal">🍽 ${log.meals.join(' · ')}</span></div>` : ''}
-      ${log.drinks?.length ? `<div style="margin-bottom:8px;"><span class="tag-pill" style="background:#e0f2fe;color:#0369a1;">💧 ${log.drinks.join(' · ')}</span></div>` : ''}
-      ${log.nap ? `<div style="margin-bottom:8px;"><span class="tag-pill tag-nap">😴 Nap: ${log.nap}</span></div>` : ''}
-      ${log.notes ? `<div style="font-size:14px;color:var(--text);margin-top:8px;line-height:1.6;">${log.notes}</div>` : ''}
+        ${log.meals?.length ? `<div style="margin-bottom:6px;"><span class="tag-pill tag-meal">🍽 ${log.meals.join(' · ')}</span></div>` : ''}
+        ${log.drinks?.length ? `<div style="margin-bottom:6px;"><span class="tag-pill" style="background:#e0f2fe;color:#0369a1;">💧 ${log.drinks.join(' · ')}</span></div>` : ''}
+        ${log.nap ? `<div style="margin-bottom:6px;"><span class="tag-pill tag-nap">😴 Nap: ${log.nap}</span></div>` : ''}
+        ${log.notes ? `<div style="font-size:14px;color:var(--text);margin-top:8px;line-height:1.6;">${log.notes}</div>` : ''}
+      </div>`;
+    }).join('');
+    return `<div style="margin-bottom:20px;">
+      <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);">${dateLabel}</div>
+      ${entries}
     </div>`;
   }).join('');
+}
+
+function formatDateLabel(dateStr) {
+  if (!dateStr || dateStr === 'Today') return 'Today';
+  try {
+    const d = new Date(dateStr + 'T00:00:00');
+    const today = new Date();
+    const yesterday = new Date(); yesterday.setDate(today.getDate() - 1);
+    if (d.toDateString() === today.toDateString()) return 'Today';
+    if (d.toDateString() === yesterday.toDateString()) return 'Yesterday';
+    return d.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+  } catch { return dateStr; }
+}
+
+function clearLogFilter() {
+  const f = document.getElementById('logMonthFilter');
+  if (f) f.value = '';
+  renderLog();
+}
+
+function printMonthlyReport() {
+  const monthFilter = document.getElementById('logMonthFilter')?.value;
+  const monthLabel = monthFilter
+    ? new Date(monthFilter + '-01').toLocaleDateString('en-GB', { month:'long', year:'numeric' })
+    : 'All Entries';
+
+  let logs = [...state.logs];
+  if (monthFilter) logs = logs.filter(l => (l.logDate || l.date || '').startsWith(monthFilter));
+  logs.sort((a,b) => (a.logDate || a.date || '').localeCompare(b.logDate || b.date || ''));
+
+  if (logs.length === 0) { showToast('No entries to print for this period'); return; }
+
+  const grouped = {};
+  logs.forEach(log => {
+    const key = log.logDate || log.date || 'Unknown';
+    if (!grouped[key]) grouped[key] = [];
+    grouped[key].push(log);
+  });
+
+  const rows = Object.keys(grouped).sort().map(dateKey => {
+    const dateLabel = formatDateLabel(dateKey);
+    const entries = grouped[dateKey].map(log => {
+      const pName = log.parent === 'A' ? state.parentAName : state.parentBName;
+      const parts = [];
+      if (log.meals?.length) parts.push(`Meals: ${log.meals.join(', ')}`);
+      if (log.drinks?.length) parts.push(`Drinks: ${log.drinks.join(', ')}`);
+      if (log.nap) parts.push(`Nap: ${log.nap}`);
+      if (log.mood) parts.push(`Mood: ${log.mood}`);
+      if (log.notes) parts.push(`Notes: ${log.notes}`);
+      return `<tr>
+        <td style="padding:8px 12px;border:1px solid #ddd;font-weight:600;white-space:nowrap;">${pName}</td>
+        <td style="padding:8px 12px;border:1px solid #ddd;">${log.time || ''}</td>
+        <td style="padding:8px 12px;border:1px solid #ddd;">${parts.join(' | ')}</td>
+      </tr>`;
+    }).join('');
+    return `<tr style="background:#f5f5f5;">
+        <td colspan="3" style="padding:10px 12px;border:1px solid #ddd;font-weight:700;font-size:14px;">${dateLabel}</td>
+      </tr>${entries}`;
+  }).join('');
+
+  const parentA = state.parentAName || 'Parent A';
+  const parentB = state.parentBName || 'Parent B';
+  const child = state.childName || 'Child';
+
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"/>
+    <title>CoParent Log Report — ${monthLabel}</title>
+    <style>
+      body { font-family: Arial, sans-serif; padding: 32px; color: #111; }
+      h1 { font-size: 24px; margin-bottom: 4px; }
+      .meta { color: #666; font-size: 13px; margin-bottom: 24px; }
+      table { width: 100%; border-collapse: collapse; font-size: 13px; }
+      th { background: #222; color: #fff; padding: 10px 12px; text-align: left; }
+      @media print { button { display: none; } }
+    </style>
+  </head><body>
+    <h1>🤝 CoParent — Daily Log Report</h1>
+    <div class="meta">
+      Child: <strong>${child}</strong> &nbsp;·&nbsp;
+      Period: <strong>${monthLabel}</strong> &nbsp;·&nbsp;
+      ${parentA} &amp; ${parentB}
+    </div>
+    <table>
+      <thead><tr>
+        <th style="width:120px;">Parent</th>
+        <th style="width:80px;">Time</th>
+        <th>Details</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div style="margin-top:32px;font-size:11px;color:#aaa;border-top:1px solid #eee;padding-top:16px;">
+      Generated by CoParent &mdash; ${new Date().toLocaleDateString('en-GB', {day:'numeric',month:'long',year:'numeric'})}
+    </div>
+    <script>window.onload = function() { window.print(); }<\/script>
+  </body></html>`;
+
+  const w = window.open('', '_blank');
+  w.document.write(html);
+  w.document.close();
 }
 
 // ══ CALENDAR ══
