@@ -1555,6 +1555,17 @@ function saveLog() {
   addNotification('📝', '#dbeafe', 'Log entry added', `${notes || 'New entry'}`);
   showToast('Log saved ✓');
 
+  if (CONFIG.useBackend) {
+    const moodMap = {'😄':'happy','😊':'good','😐':'okay','😢':'upset','😴':'tired'};
+    fetchAPI('/api/logs', { method: 'POST', body: {
+      meals: { breakfast: chips.includes('Breakfast'), lunch: chips.includes('Lunch'), dinner: chips.includes('Dinner'), snacks: chips.includes('Snack') },
+      drinks: { water: chips.includes('Water'), milk: chips.includes('Milk'), juice: chips.includes('Juice') },
+      napStart: napStart || null, napEnd: napEnd || null,
+      mood: moodMap[state.selectedMood] || null,
+      notes: notes || null, logDate: todayStr
+    }}).catch(e => console.error('Log save failed:', e.message));
+  }
+
   // Reset form
   document.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
   document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
@@ -1901,6 +1912,15 @@ function submitRequest() {
   renderRequests();
   addNotification('📅', '#fef3c7', 'Change request submitted', `Request for ${dateStr} sent`);
   showToast('Request submitted ✓');
+
+  if (CONFIG.useBackend) {
+    const d = new Date(document.getElementById('reqDate').value);
+    fetchAPI('/api/requests', { method: 'POST', body: {
+      dates: [d.toISOString().split('T')[0]],
+      reason: document.getElementById('reqReason').value.trim() || null
+    }}).catch(e => console.error('Request save failed:', e.message));
+  }
+
   document.getElementById('reqReason').value = '';
 }
 
@@ -1908,6 +1928,11 @@ function respondToRequest(id, response) {
   const req = state.requests.find(r => r.id === id);
   if (req) {
     req.status = response;
+
+    if (CONFIG.useBackend) {
+      fetchAPI(`/api/requests/${id}/respond`, { method: 'PUT', body: { action: response } })
+        .catch(e => console.error('Respond failed:', e.message));
+    }
 
     // If accepted, apply the override to the calendar
     if (response === 'accepted') {
