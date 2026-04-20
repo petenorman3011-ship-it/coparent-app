@@ -184,6 +184,8 @@
     .cal-day.parent-b { background: var(--parent-b-light); color: #5b21b6; font-weight: 600; }
     .cal-day.today { outline: 2px solid var(--teal); outline-offset: 2px; }
     .cal-day.has-request::after { content: ''; position: absolute; top: 4px; right: 4px; width: 6px; height: 6px; border-radius: 50%; background: var(--rose); }
+    .cal-day.has-override { outline: 2px solid #f59e0b; outline-offset: 1px; }
+    .cal-day.has-override::before { content: '\21C4'; position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%); font-size: 8px; color: #f59e0b; }
     .cal-legend { display: flex; gap: 16px; margin-top: 16px; }
     .legend-item { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; }
     .legend-dot { width: 12px; height: 12px; border-radius: 4px; }
@@ -985,12 +987,18 @@ let state = {
     week1: { mon:'A', tue:'A', wed:'A', thu:'B', fri:'B', sat:'B', sun:'B' },
     week2: { mon:'B', tue:'B', wed:'B', thu:'A', fri:'A', sat:'A', sun:'A' }
   },
+  calendarOverrides: {}, // date overrides from accepted change requests e.g. { '2026-04-24': 'A' }
 };
 
 // ══ SCHEDULE — uses custom Week 1/Week 2 pattern from state ══
 const JS_TO_KEY = ['sun','mon','tue','wed','thu','fri','sat'];
 function getParentForDate(date) {
   if (!state.schedule) return 'A';
+  // Check for accepted overrides first
+  const dateStr = date.toISOString().split('T')[0];
+  if (state.calendarOverrides && state.calendarOverrides[dateStr]) {
+    return state.calendarOverrides[dateStr];
+  }
   const start = new Date(2026, 0, 5); // known Week 1 Monday
   const diffWeeks = Math.floor((date - start) / (7 * 24 * 60 * 60 * 1000));
   const isWeek1 = (((diffWeeks % 2) + 2) % 2) === 0;
@@ -1815,7 +1823,9 @@ function renderCalendar() {
     const parent = getParentForDate(date);
     const isToday = date.toDateString() === today.toDateString();
     const hasReq = state.requests.some(r => r.dates.includes(d) && r.status === 'pending');
-    html += `<div class="cal-day parent-${parent.toLowerCase()}${isToday ? ' today' : ''}${hasReq ? ' has-request' : ''}" onclick="showDayDetail(${d},${month},${year})">${d}</div>`;
+    const isoDate = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const hasOverride = state.calendarOverrides && state.calendarOverrides[isoDate];
+    html += `<div class="cal-day parent-${parent.toLowerCase()}${isToday ? ' today' : ''}${hasReq ? ' has-request' : ''}${hasOverride ? ' has-override' : ''}" onclick="showDayDetail(${d},${month},${year})">${d}</div>`;
   }
 
   document.getElementById('calGrid').innerHTML = html;
@@ -1893,6 +1903,27 @@ function respondToRequest(id, response) {
   const req = state.requests.find(r => r.id === id);
   if (req) {
     req.status = response;
+
+    // If accepted, apply the override to the calendar
+    if (response === 'accepted') {
+      if (!state.calendarOverrides) state.calendarOverrides = {};
+      // req.dates is a string like "24 Apr 2026" or an array — handle both
+      const datesToOverride = Array.isArray(req.dates) ? req.dates : [req.dates];
+      datesToOverride.forEach(dateStr => {
+        try {
+          // Parse the date string to ISO format
+          const parsed = new Date(dateStr);
+          if (!isNaN(parsed)) {
+            const iso = parsed.toISOString().split('T')[0];
+            // Swap the parent for that date
+            const currentOwner = getParentForDate(parsed);
+            state.calendarOverrides[iso] = currentOwner === 'A' ? 'B' : 'A';
+          }
+        } catch(e) {}
+      });
+      renderCalendar(); // refresh calendar immediately
+    }
+
     renderRequests();
     const label = response === 'accepted' ? 'accepted ✓' : 'declined';
     addNotification('📅', response === 'accepted' ? '#d1fae5' : '#fee2e2', `Change request ${label}`, `Request for ${req.dates} was ${label}`);
