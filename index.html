@@ -925,17 +925,15 @@
 // ══ BACKEND CONFIG ══
 const CONFIG = { apiBase: 'https://api-production-b188.up.railway.app', useBackend: true };
 
-async function fetchAPI(endpoint, method = 'GET', body = null, requiresAuth = false) {
+async function fetchAPI(endpoint, opts = {}, tokenOverride = null) {
   if (!CONFIG.useBackend) return null;
-  const headers = { 'Content-Type': 'application/json' };
-  if (requiresAuth) {
-    const token = localStorage.getItem('kinnect_token');
-    if (token) headers['Authorization'] = `Bearer ${token}`;
-  }
-  const opts = { method, headers };
-  if (body) opts.body = JSON.stringify(body);
+  const token = tokenOverride || localStorage.getItem('kinnect_token');
+  const headers = { 'Content-Type': 'application/json', ...(opts.headers || {}) };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+  const fetchOpts = { method: opts.method || 'GET', headers };
+  if (opts.body) fetchOpts.body = JSON.stringify(opts.body);
   try {
-    const res = await fetch(CONFIG.apiBase + endpoint, opts);
+    const res = await fetch(CONFIG.apiBase + endpoint, fetchOpts);
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw Object.assign(new Error(data.error || `API ${res.status}`), { status: res.status, data });
     return data;
@@ -1071,7 +1069,7 @@ async function authLogin() {
   try {
     let result;
     if (CONFIG.useBackend) {
-      result = await fetchAPI('/api/auth/login', 'POST', { email, password });
+      result = await fetchAPI('/api/auth/login', { method: 'POST', body: { email, password } });
     } else {
       await sleep(800);
       // Demo mode: accept any credentials, treat email as identifier
@@ -1112,7 +1110,7 @@ async function authRegister() {
   try {
     let result;
     if (CONFIG.useBackend) {
-      result = await fetchAPI('/api/auth/register', 'POST', { email, password, fullName, childName, childDob });
+      result = await fetchAPI('/api/auth/register', { method: 'POST', body: { email, password, fullName, childName, childDob } });
     } else {
       await sleep(900);
       const stored = localStorage.getItem('kinnect_demo_users');
@@ -1156,7 +1154,7 @@ async function authJoin() {
   try {
     let result;
     if (CONFIG.useBackend) {
-      result = await fetchAPI('/api/auth/join', 'POST', { email, password, fullName, inviteCode });
+      result = await fetchAPI('/api/auth/join', { method: 'POST', body: { email, password, fullName, inviteCode } });
     } else {
       await sleep(900);
       const stored = localStorage.getItem('kinnect_demo_users');
@@ -1221,6 +1219,7 @@ function launchApp() {
   document.getElementById('authScreen').style.display = 'none';
   document.getElementById('app').classList.add('visible');
   initApp();
+  if (CONFIG.useBackend) startSyncLoop();
 }
 
 // ══ APP INIT ══
@@ -1458,15 +1457,21 @@ function useRewrite(warningId) {
 }
 
 
-function pushMessage(text) {
+async function pushMessage(text) {
   const now = new Date();
   const time = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+  // Optimistic update
   state.messages.push({ id: Date.now(), from: state.currentParent, text, time });
   renderMessages();
   const list = document.getElementById('messagesList');
   list.scrollTop = list.scrollHeight;
-  addNotification('💬', '#ccfbf1', 'Message sent', text.slice(0, 40) + (text.length > 40 ? '...' : ''));
   showToast('Message sent ✓');
+  // Save to backend
+  if (CONFIG.useBackend) {
+    try {
+      await fetchAPI('/api/messages', { method: 'POST', body: { content: text } });
+    } catch(e) { console.error('Failed to save message:', e.message); }
+  }
 }
 
 // ══ LOG ══
@@ -2280,6 +2285,76 @@ window.addEventListener('load', () => {
   // No valid session — show auth screen
   showAuthScreen('authLogin');
 });
+
+// ══ REAL-TIME SYNC (polls backend every 30s) ══
+async function syncFromBackend() {
+  if (!CONFIG.useBackend || !state.currentParent) return;
+  const token = localStorage.getItem('kinnect_token');
+  if (!token) return;
+
+  try {
+    // Sync messages
+    const msgs = await fetchAPI('/api/messages', {}, token);
+    if (msgs && Array.isArray(msgs) && msgs.length !== state.messages.length) {
+      state.messages = msgs.map(m => ({
+        id: m.id,
+        from: m.senderRole === 'parent_a' ? 'A' : 'B',
+        text: m.content,
+        time: new Date(m.sentAt).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
+      }));
+      const activeScreen = document.querySelector('.screen.active')?.id;
+      if (activeScreen === 'screen-messages') renderMessages();
+      // Show notification badge if new messages
+      const unread = msgs.filter(m => m.senderRole !== (state.currentParent === 'A' ? 'parent_a' : 'parent_b') && !m.readAt);
+      const badge = document.getElementById('msgBadge');
+      if (badge) { badge.textContent = unread.length; badge.style.display = unread.length > 0 ? 'flex' : 'none'; }
+    }
+
+    // Sync logs
+    const logs = await fetchAPI('/api/logs', {}, token);
+    if (logs && Array.isArray(logs)) {
+      state.logs = logs.map(l => ({
+        id: l.id,
+        parent: l.loggedByRole === 'parent_a' ? 'A' : 'B',
+        logDate: l.logDate,
+        date: l.logDate,
+        time: l.createdAt ? new Date(l.createdAt).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) : '',
+        meals: l.meals ? Object.keys(l.meals).filter(k => l.meals[k] && k !== 'appetite') : [],
+        drinks: l.drinks ? Object.keys(l.drinks).filter(k => l.drinks[k] && k !== 'amount') : [],
+        nap: l.napStart && l.napEnd ? `${l.napStart}–${l.napEnd}` : null,
+        mood: l.mood === 'happy' ? '😄' : l.mood === 'good' ? '😊' : l.mood === 'okay' ? '😐' : l.mood === 'upset' ? '😢' : l.mood === 'tired' ? '😴' : '',
+        notes: l.notes
+      }));
+      const activeScreen = document.querySelector('.screen.active')?.id;
+      if (activeScreen === 'screen-log') renderLog();
+      if (activeScreen === 'screen-home') renderHome();
+    }
+
+    // Sync change requests
+    const reqs = await fetchAPI('/api/requests', {}, token);
+    if (reqs && Array.isArray(reqs)) {
+      state.requests = reqs.map(r => ({
+        id: r.id,
+        from: r.requestedByRole === 'parent_a' ? 'A' : 'B',
+        dates: Array.isArray(r.dates) ? r.dates.join(', ') : r.dates,
+        reason: r.reason || 'No reason given',
+        status: r.status
+      }));
+      const activeScreen = document.querySelector('.screen.active')?.id;
+      if (activeScreen === 'screen-calendar') renderRequests();
+    }
+
+  } catch(e) {
+    // Silent fail — don't disrupt UX on network issues
+    console.log('Sync error:', e.message);
+  }
+}
+
+// Start sync loop after login
+function startSyncLoop() {
+  syncFromBackend(); // immediate first sync
+  setInterval(syncFromBackend, 30000); // then every 30 seconds
+}
 
 // PWA install prompt
 let deferredPrompt = null;
