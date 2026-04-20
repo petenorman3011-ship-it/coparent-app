@@ -566,7 +566,27 @@
       <!-- Schedule Setup -->
       <div class="card">
         <div class="card-title">📅 Custody Schedule</div>
-        <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">Set your fortnightly Week 1 / Week 2 arrangement. Tap each day to assign it to a parent.</p>
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">Set your fortnightly Week 1 / Week 2 arrangement. Tap each day to toggle between parents.</p>
+
+        <!-- Mam/Dad labels -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
+          <div>
+            <label style="font-size:12px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:4px;">You are <span style="color:var(--parent-a);">●</span></label>
+            <select id="labelA" onchange="updateParentLabel('A')" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:15px;font-family:'Inter',sans-serif;outline:none;">
+              <option value="Mam">Mam</option>
+              <option value="Dad">Dad</option>
+              <option value="Mum">Mum</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:4px;">Other parent is <span style="color:var(--parent-b);">●</span></label>
+            <select id="labelB" onchange="updateParentLabel('B')" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:15px;font-family:'Inter',sans-serif;outline:none;">
+              <option value="Dad">Dad</option>
+              <option value="Mam">Mam</option>
+              <option value="Mum">Mum</option>
+            </select>
+          </div>
+        </div>
 
         <div style="margin-bottom:20px;">
           <div style="font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-muted);margin-bottom:10px;">Week 1</div>
@@ -920,8 +940,8 @@ let state = {
   currentFamily: null,   // { id, inviteCode }
   currentChild: null,    // { id, name }
   currentParent: null,
-  parentAName: 'Parent A',
-  parentBName: 'Parent B',
+  parentAName: 'Mam',
+  parentBName: 'Dad',
   childName: 'your child',
   messages: [
     { id: 1, from: 'B', text: 'Just to let you know, she had a great day at nursery today 😊', time: '10:32' },
@@ -1944,8 +1964,9 @@ function saveChildProfile() {
 
 function copyInviteCode() {
   const code = document.getElementById('inviteCode')?.textContent;
+  const text = `Join me on CoKinnect!\n\nOpen the app here: https://petenorman3011-ship-it.github.io/coparent-app/\n\nThen tap "Join as other parent" and enter invite code: ${code}`;
   if (navigator.clipboard) {
-    navigator.clipboard.writeText(code).then(() => showToast('Invite code copied ✓'));
+    navigator.clipboard.writeText(text).then(() => showToast('Invite copied ✓'));
   } else {
     showToast('Code: ' + code);
   }
@@ -1953,13 +1974,26 @@ function copyInviteCode() {
 
 function shareInviteCode() {
   const code = document.getElementById('inviteCode')?.textContent;
-  const text = `Join me on CoKinnect! Use invite code: ${code} to set up your account at https://petenorman3011-ship-it.github.io/cokinnect-app/`;
+  const text = `Join me on CoKinnect!\n\nOpen the app here: https://petenorman3011-ship-it.github.io/coparent-app/\n\nThen tap "Join as other parent" and enter invite code: ${code}`;
   if (navigator.share) {
-    navigator.share({ title: 'CoKinnect Invite', text });
+    navigator.share({ title: 'Join me on CoKinnect', text });
   } else {
-    copyInviteCode();
-    showToast('Link copied ✓ — paste it to share');
+    if (navigator.clipboard) navigator.clipboard.writeText(text);
+    showToast('Invite copied ✓ — paste it to share');
   }
+}
+
+function updateParentLabel(parent) {
+  const val = document.getElementById('label' + parent)?.value;
+  if (!val) return;
+  if (parent === 'A') state.parentAName = val;
+  else state.parentBName = val;
+  renderScheduleBuilder();
+  renderHome();
+  const la = document.getElementById('legendA');
+  const lb = document.getElementById('legendB');
+  if (la) la.textContent = state.parentAName;
+  if (lb) lb.textContent = state.parentBName;
 }
 
 function signOut() {
@@ -1991,6 +2025,11 @@ function initSettings() {
     const emailInfo = document.getElementById('settingsEmailInfo');
     if (emailInfo) emailInfo.textContent = state.currentUser.email;
   }
+  // Set Mam/Dad dropdowns
+  const la = document.getElementById('labelA');
+  const lb = document.getElementById('labelB');
+  if (la && ['Mam','Dad','Mum'].includes(state.parentAName)) la.value = state.parentAName;
+  if (lb && ['Mam','Dad','Mum'].includes(state.parentBName)) lb.value = state.parentBName;
 }
 
 // ══ NAV ══
