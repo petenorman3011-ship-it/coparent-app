@@ -1342,16 +1342,19 @@ const FLAGGED_WORDS = [
 ];
 
 function moderateMessage(text) {
-  const lower = text.toLowerCase();
+  const lower = text.toLowerCase().replace(/[!@#$%^&*(),.?":{}|<>]/g, ' ');
   const found = FLAGGED_WORDS.filter(w => {
-    // Use word boundary check for short words to avoid false positives
-    if (w.length <= 4) {
-      const regex = new RegExp('(?:^|\\s|[^a-z])' + w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?:$|\\s|[^a-z])', 'i');
-      return regex.test(lower);
-    }
-    return lower.includes(w);
+    // For multi-word phrases, check as substring
+    if (w.includes(' ')) return lower.includes(w);
+    // For single words, use word boundary
+    const regex = new RegExp('(?:^|[\\s,!?.])' + w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?:[\\s,!?.]|$)', 'i');
+    return regex.test(' ' + lower + ' ');
   });
-  return found.length > 0 ? found : null;
+  // Also check for common letter substitutions (h3ll, sh!t etc)
+  const leetText = lower.replace(/0/g,'o').replace(/1/g,'i').replace(/3/g,'e').replace(/4/g,'a').replace(/5/g,'s').replace(/8/g,'b').replace(/@/g,'a').replace(/\$/g,'s').replace(/!/g,'i');
+  const leetFound = FLAGGED_WORDS.filter(w => leetText.includes(w));
+  const allFound = [...new Set([...found, ...leetFound])];
+  return allFound.length > 0 ? allFound : null;
 }
 
 function getSuggestion(text) {
