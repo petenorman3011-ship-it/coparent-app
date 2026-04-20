@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CoKinnect — Pricing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #0f172a;
+    --surface: #1e293b;
+    --surface2: #273549;
+    --border: #334155;
+    --teal: #0d9488;
+    --teal-light: #14b8a6;
+    --teal-dim: rgba(13,148,136,0.12);
+    --text: #f1f5f9;
+    --text-muted: #94a3b8;
+    --text-dim: #64748b;
+    --amber: #f59e0b;
+    --amber-dim: rgba(245,158,11,0.1);
+    --radius: 16px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Inter', sans-serif; background: var(--bg);
+    color: var(--text); min-height: 100vh; line-height: 1.6;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(15,23,42,0.95); backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px; height: 60px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .nav-brand { font-size: 18px; font-weight: 800; color: var(--teal); display: flex; align-items: center; gap: 8px; }
+  .nav-links { display: flex; gap: 8px; }
+  .nav-link {
+    padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: 600;
+    text-decoration: none; color: var(--text-muted); transition: all 0.2s;
+    cursor: pointer; border: none; background: none; font-family: 'Inter', sans-serif;
+  }
+  .nav-link:hover { color: var(--text); background: var(--surface2); }
+  .nav-link.primary {
+    background: var(--teal); color: #fff;
+  }
+  .nav-link.primary:hover { background: var(--teal-light); }
+
+  /* ── HERO ── */
+  .hero { text-align: center; padding: 80px 24px 56px; }
+  .hero-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--teal-dim); border: 1px solid rgba(13,148,136,0.3);
+    color: var(--teal-light); font-size: 13px; font-weight: 600;
+    padding: 6px 14px; border-radius: 20px; margin-bottom: 20px;
+  }
+  .hero h1 {
+    font-size: clamp(32px, 6vw, 52px); font-weight: 900; line-height: 1.15;
+    margin-bottom: 16px; letter-spacing: -0.5px;
+  }
+  .hero h1 span { color: var(--teal); }
+  .hero p {
+    font-size: 18px; color: var(--text-muted); max-width: 520px;
+    margin: 0 auto 32px;
+  }
+  .toggle-billing {
+    display: inline-flex; align-items: center; gap: 12px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 40px; padding: 6px 8px; font-size: 14px;
+  }
+  .billing-opt {
+    padding: 6px 16px; border-radius: 30px; cursor: pointer;
+    font-weight: 600; transition: all 0.2s; color: var(--text-muted);
+    border: none; background: none; font-family: 'Inter', sans-serif; font-size: 14px;
+  }
+  .billing-opt.active { background: var(--teal); color: #fff; }
+  .save-badge {
+    background: var(--amber-dim); color: var(--amber);
+    font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px;
+  }
+
+  /* ── PRICING CARDS ── */
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    max-width: 960px;
+    margin: 0 auto 80px;
+    padding: 0 24px;
+  }
+  .plan-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 20px; padding: 32px; position: relative;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  .plan-card:hover { transform: translateY(-4px); }
+  .plan-card.featured {
+    border-color: var(--teal); background: linear-gradient(160deg, #1e293b 0%, #162430 100%);
+  }
+  .plan-card.featured::before {
+    content: 'Most Popular';
+    position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
+    background: var(--teal); color: #fff; font-size: 12px; font-weight: 700;
+    padding: 4px 16px; border-radius: 20px; white-space: nowrap;
+  }
+  .plan-icon { font-size: 32px; margin-bottom: 12px; }
+  .plan-name { font-size: 13px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; }
+  .plan-price-row { display: flex; align-items: baseline; gap: 4px; margin-bottom: 6px; }
+  .plan-price { font-size: 44px; font-weight: 900; color: var(--text); }
+  .plan-price.free-price { font-size: 40px; }
+  .plan-period { font-size: 14px; color: var(--text-muted); }
+  .plan-desc { font-size: 14px; color: var(--text-muted); margin-bottom: 28px; min-height: 40px; }
+  .plan-cta {
+    display: block; width: 100%; padding: 14px; text-align: center;
+    border-radius: 12px; font-size: 15px; font-weight: 700;
+    text-decoration: none; cursor: pointer; transition: all 0.2s;
+    border: none; font-family: 'Inter', sans-serif; margin-bottom: 28px;
+  }
+  .plan-cta.outline {
+    background: transparent; color: var(--text-muted);
+    border: 1.5px solid var(--border);
+  }
+  .plan-cta.outline:hover { border-color: var(--teal); color: var(--teal); }
+  .plan-cta.teal { background: var(--teal); color: #fff; }
+  .plan-cta.teal:hover { background: var(--teal-light); }
+  .plan-features { list-style: none; }
+  .plan-features li {
+    display: flex; align-items: flex-start; gap: 10px;
+    font-size: 14px; padding: 7px 0; color: var(--text-muted);
+    border-bottom: 1px solid rgba(51,65,85,0.4);
+  }
+  .plan-features li:last-child { border-bottom: none; }
+  .plan-features li.included { color: var(--text); }
+  .feat-icon { font-size: 14px; flex-shrink: 0; margin-top: 2px; }
+
+  /* ── COMPARISON TABLE ── */
+  .compare-section { max-width: 960px; margin: 0 auto 80px; padding: 0 24px; }
+  .compare-section h2 { font-size: 28px; font-weight: 800; text-align: center; margin-bottom: 8px; }
+  .compare-sub { text-align: center; color: var(--text-muted); font-size: 15px; margin-bottom: 32px; }
+  .compare-table-wrap { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); }
+  table.compare { width: 100%; border-collapse: collapse; }
+  table.compare th {
+    padding: 16px 20px; font-size: 14px; font-weight: 700;
+    border-bottom: 1px solid var(--border); background: var(--surface);
+    text-align: center; white-space: nowrap;
+  }
+  table.compare th:first-child { text-align: left; }
+  table.compare th.featured-col { color: var(--teal); }
+  table.compare td {
+    padding: 13px 20px; font-size: 14px; border-bottom: 1px solid rgba(51,65,85,0.4);
+    text-align: center; color: var(--text-muted);
+  }
+  table.compare td:first-child { text-align: left; color: var(--text); font-weight: 500; }
+  table.compare tr:last-child td { border-bottom: none; }
+  table.compare tr:hover td { background: var(--surface2); }
+  .check { color: var(--teal); font-size: 16px; }
+  .cross { color: var(--text-dim); font-size: 16px; }
+  .section-row td { background: var(--surface2) !important; font-size: 11px !important; font-weight: 700 !important; letter-spacing: 1px; text-transform: uppercase; color: var(--text-dim) !important; }
+
+  /* ── FAQ ── */
+  .faq-section { max-width: 680px; margin: 0 auto 80px; padding: 0 24px; }
+  .faq-section h2 { font-size: 28px; font-weight: 800; text-align: center; margin-bottom: 8px; }
+  .faq-sub { text-align: center; color: var(--text-muted); font-size: 15px; margin-bottom: 36px; }
+  .faq-item {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); margin-bottom: 12px; overflow: hidden;
+  }
+  .faq-q {
+    padding: 18px 22px; font-size: 15px; font-weight: 600;
+    cursor: pointer; display: flex; align-items: center; justify-content: space-between;
+    gap: 16px; user-select: none;
+  }
+  .faq-q:hover { color: var(--teal); }
+  .faq-chevron { font-size: 18px; transition: transform 0.2s; flex-shrink: 0; color: var(--text-muted); }
+  .faq-item.open .faq-chevron { transform: rotate(180deg); }
+  .faq-a {
+    max-height: 0; overflow: hidden; transition: max-height 0.3s ease;
+    padding: 0 22px; color: var(--text-muted); font-size: 14px;
+  }
+  .faq-item.open .faq-a { max-height: 300px; padding: 0 22px 18px; }
+
+  /* ── CTA BANNER ── */
+  .cta-banner {
+    max-width: 760px; margin: 0 auto 80px; padding: 0 24px;
+    text-align: center;
+  }
+  .cta-box {
+    background: linear-gradient(135deg, #0d9488 0%, #0891b2 100%);
+    border-radius: 24px; padding: 56px 40px;
+  }
+  .cta-box h2 { font-size: 28px; font-weight: 800; margin-bottom: 12px; color: #fff; }
+  .cta-box p { font-size: 16px; color: rgba(255,255,255,0.8); margin-bottom: 28px; }
+  .cta-buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .cta-btn {
+    padding: 14px 28px; border-radius: 12px; font-size: 15px; font-weight: 700;
+    text-decoration: none; transition: all 0.2s; border: none; cursor: pointer;
+    font-family: 'Inter', sans-serif;
+  }
+  .cta-btn.white { background: #fff; color: var(--teal); }
+  .cta-btn.white:hover { background: #f0fdfa; }
+  .cta-btn.ghost { background: rgba(255,255,255,0.15); color: #fff; border: 1.5px solid rgba(255,255,255,0.3); }
+  .cta-btn.ghost:hover { background: rgba(255,255,255,0.25); }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--border); padding: 24px;
+    text-align: center; font-size: 13px; color: var(--text-dim);
+  }
+  footer a { color: var(--text-muted); text-decoration: none; }
+  footer a:hover { color: var(--teal); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 760px) {
+    .pricing-grid { grid-template-columns: 1fr; max-width: 420px; }
+    .plan-card.featured { margin-top: 14px; }
+    .hero h1 { font-size: 30px; }
+    .hero p { font-size: 16px; }
+    .cta-box { padding: 40px 24px; }
+    .cta-box h2 { font-size: 22px; }
+    table.compare th, table.compare td { padding: 12px 14px; font-size: 13px; }
+  }
+  @media (max-width: 480px) {
+    .nav-links .nav-link:not(.primary) { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand">🔗 CoKinnect</div>
+  <div class="nav-links">
+    <a class="nav-link" href="index.html">← App</a>
+    <a class="nav-link primary" href="index.html">Get Started Free</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-pill">💷 Simple, honest pricing</div>
+  <h1>Co-parenting made <span>easier</span><br>for every family</h1>
+  <p>Start free forever. Upgrade when you're ready for more. No hidden fees, no surprises.</p>
+  <div class="toggle-billing">
+    <button class="billing-opt active" id="billMonthly" onclick="setBilling('monthly')">Monthly</button>
+    <button class="billing-opt" id="billAnnual" onclick="setBilling('annual')">Annual <span class="save-badge">Save 20%</span></button>
+  </div>
+</header>
+
+<!-- PRICING CARDS -->
+<div class="pricing-grid">
+
+  <!-- FREE -->
+  <div class="plan-card">
+    <div class="plan-icon">🌱</div>
+    <div class="plan-name">Free</div>
+    <div class="plan-price-row">
+      <div class="plan-price free-price">£0</div>
+    </div>
+    <div class="plan-desc">Everything you need to get started with co-parenting coordination.</div>
+    <a href="index.html" class="plan-cta outline">Start for free</a>
+    <ul class="plan-features">
+      <li class="included"><span class="feat-icon">✅</span> Shared custody calendar</li>
+      <li class="included"><span class="feat-icon">✅</span> In-app messaging</li>
+      <li class="included"><span class="feat-icon">✅</span> Handover notes (10/month)</li>
+      <li class="included"><span class="feat-icon">✅</span> Child profile (1 child)</li>
+      <li class="included"><span class="feat-icon">✅</span> Basic notifications</li>
+      <li><span class="feat-icon">—</span> Expense tracking</li>
+      <li><span class="feat-icon">—</span> Medication log</li>
+      <li><span class="feat-icon">—</span> Document storage</li>
+      <li><span class="feat-icon">—</span> Priority support</li>
+    </ul>
+  </div>
+
+  <!-- PREMIUM -->
+  <div class="plan-card featured">
+    <div class="plan-icon">⭐</div>
+    <div class="plan-name">Premium</div>
+    <div class="plan-price-row">
+      <div class="plan-price" id="premiumPrice">£7.99</div>
+      <div class="plan-period" id="premiumPeriod">/month</div>
+    </div>
+    <div class="plan-desc">For parents who want the full picture. Includes everything in Free, plus more.</div>
+    <a href="index.html" class="plan-cta teal">Get Premium</a>
+    <ul class="plan-features">
+      <li class="included"><span class="feat-icon">✅</span> Everything in Free</li>
+      <li class="included"><span class="feat-icon">✅</span> Unlimited handover notes</li>
+      <li class="included"><span class="feat-icon">✅</span> Expense tracking & splits</li>
+      <li class="included"><span class="feat-icon">✅</span> Medication log & reminders</li>
+      <li class="included"><span class="feat-icon">✅</span> Up to 3 children</li>
+      <li class="included"><span class="feat-icon">✅</span> Document storage (500MB)</li>
+      <li class="included"><span class="feat-icon">✅</span> Message read receipts</li>
+      <li class="included"><span class="feat-icon">✅</span> Export all data (PDF)</li>
+      <li><span class="feat-icon">—</span> Priority support</li>
+    </ul>
+  </div>
+
+  <!-- FAMILY -->
+  <div class="plan-card">
+    <div class="plan-icon">👨‍👩‍👧‍👦</div>
+    <div class="plan-name">Family</div>
+    <div class="plan-price-row">
+      <div class="plan-price" id="familyPrice">£12.99</div>
+      <div class="plan-period" id="familyPeriod">/month</div>
+    </div>
+    <div class="plan-desc">For complex arrangements. Supports blended families, grandparents, and beyond.</div>
+    <a href="index.html" class="plan-cta outline" style="border-color:var(--amber);color:var(--amber);" onmouseover="this.style.background='rgba(245,158,11,0.1)'" onmouseout="this.style.background='transparent'">Get Family Plan</a>
+    <ul class="plan-features">
+      <li class="included"><span class="feat-icon">✅</span> Everything in Premium</li>
+      <li class="included"><span class="feat-icon">✅</span> Unlimited children</li>
+      <li class="included"><span class="feat-icon">✅</span> Multiple caregivers (up to 6)</li>
+      <li class="included"><span class="feat-icon">✅</span> Grandparent/guardian access</li>
+      <li class="included"><span class="feat-icon">✅</span> Document storage (2GB)</li>
+      <li class="included"><span class="feat-icon">✅</span> Legal document templates</li>
+      <li class="included"><span class="feat-icon">✅</span> Priority support</li>
+      <li class="included"><span class="feat-icon">✅</span> Dedicated account manager</li>
+      <li class="included"><span class="feat-icon">✅</span> Custom schedule templates</li>
+    </ul>
+  </div>
+
+</div>
+
+<!-- COMPARISON TABLE -->
+<div class="compare-section">
+  <h2>Full feature comparison</h2>
+  <p class="compare-sub">See exactly what's included in each plan</p>
+  <div class="compare-table-wrap">
+    <table class="compare">
+      <thead>
+        <tr>
+          <th>Feature</th>
+          <th>Free</th>
+          <th class="featured-col">Premium ⭐</th>
+          <th>Family</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="section-row"><td colspan="4">Core Features</td></tr>
+        <tr><td>Shared custody calendar</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>In-app messaging</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>Handover notes</td><td>10/month</td><td>Unlimited</td><td>Unlimited</td></tr>
+        <tr><td>Children supported</td><td>1</td><td>Up to 3</td><td>Unlimited</td></tr>
+        <tr><td>Push notifications</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+
+        <tr class="section-row"><td colspan="4">Finance & Documents</td></tr>
+        <tr><td>Expense tracking & splits</td><td><span class="cross">—</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>Document storage</td><td><span class="cross">—</span></td><td>500 MB</td><td>2 GB</td></tr>
+        <tr><td>Legal document templates</td><td><span class="cross">—</span></td><td><span class="cross">—</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>Export all data (PDF/CSV)</td><td><span class="cross">—</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+
+        <tr class="section-row"><td colspan="4">Health & Safety</td></tr>
+        <tr><td>Medication log</td><td><span class="cross">—</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>Med reminders & alerts</td><td><span class="cross">—</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>Child health profile</td><td>Basic</td><td>Full</td><td>Full</td></tr>
+
+        <tr class="section-row"><td colspan="4">Family Access</td></tr>
+        <tr><td>Caregiver accounts</td><td>2 (parents)</td><td>2 (parents)</td><td>Up to 6</td></tr>
+        <tr><td>Grandparent/guardian access</td><td><span class="cross">—</span></td><td><span class="cross">—</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>Custom schedule templates</td><td><span class="cross">—</span></td><td><span class="cross">—</span></td><td><span class="check">✓</span></td></tr>
+
+        <tr class="section-row"><td colspan="4">Support</td></tr>
+        <tr><td>Community support</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>Email support</td><td><span class="cross">—</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>Priority support</td><td><span class="cross">—</span></td><td><span class="cross">—</span></td><td><span class="check">✓</span></td></tr>
+        <tr><td>Dedicated account manager</td><td><span class="cross">—</span></td><td><span class="cross">—</span></td><td><span class="check">✓</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- FAQ -->
+<div class="faq-section">
+  <h2>Frequently asked questions</h2>
+  <p class="faq-sub">Everything you need to know about our pricing</p>
+
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFaq(this)">
+      Can I switch plans at any time?
+      <span class="faq-chevron">⌄</span>
+    </div>
+    <div class="faq-a">
+      Yes — you can upgrade or downgrade your plan at any time from the Settings screen inside the app. Upgrades take effect immediately. If you downgrade, you'll keep your current plan's features until the end of your billing period, then switch automatically. There are no penalties or fees for changing plans.
+    </div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFaq(this)">
+      Do both parents need to pay separately?
+      <span class="faq-chevron">⌄</span>
+    </div>
+    <div class="faq-a">
+      No — CoKinnect uses a family portal model. One parent purchases the plan and sends an invite code to the other parent. Both parents then access the full shared portal under the same subscription. You only pay once per family, not per person.
+    </div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q" onclick="toggleFaq(this)">
+      What happens to my data if I cancel?
+      <span class="faq-chevron">⌄</span>
+    </div>
+    <div class="faq-a">
+      Your data is always yours. If you cancel a paid plan, your account moves to the Free tier — you won't lose any existing data, but features above the Free limit will become read-only. You can export all your data at any time (Premium and Family plans) using the in-app export tool. We retain your data for 12 months after cancellation before deletion.
+    </div>
+  </div>
+</div>
+
+<!-- CTA BANNER -->
+<div class="cta-banner">
+  <div class="cta-box">
+    <h2>Start co-parenting smarter today</h2>
+    <p>Join hundreds of families using CoKinnect to reduce conflict and put kids first. Free to start — no credit card needed.</p>
+    <div class="cta-buttons">
+      <a href="index.html" class="cta-btn white">🚀 Get Started Free</a>
+      <a href="index.html" class="cta-btn ghost">See the App →</a>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <p>© 2026 CoKinnect · Built for families · <a href="index.html">App</a> · <a href="admin.html">Admin</a></p>
+</footer>
+
+<script>
+// Billing toggle
+function setBilling(type) {
+  const isAnnual = type === 'annual';
+  document.getElementById('billMonthly').className = 'billing-opt' + (isAnnual ? '' : ' active');
+  document.getElementById('billAnnual').className   = 'billing-opt' + (isAnnual ? ' active' : '');
+
+  const premPrice  = isAnnual ? '£6.39' : '£7.99';
+  const famPrice   = isAnnual ? '£10.39' : '£12.99';
+  const period     = isAnnual ? '/month, billed annually' : '/month';
+
+  document.getElementById('premiumPrice').textContent  = premPrice;
+  document.getElementById('familyPrice').textContent   = famPrice;
+  document.getElementById('premiumPeriod').textContent = period;
+  document.getElementById('familyPeriod').textContent  = period;
+}
+
+// FAQ accordion
+function toggleFaq(el) {
+  const item = el.parentElement;
+  item.classList.toggle('open');
+}
+</script>
+</body>
+</html>
