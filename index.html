@@ -55,6 +55,14 @@
       outline: none; transition: border-color 0.2s; background: #fff; color: var(--text);
     }
     .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--teal); }
+    .form-group input:-webkit-autofill,
+    .form-group input:-webkit-autofill:hover,
+    .form-group input:-webkit-autofill:focus {
+      -webkit-box-shadow: 0 0 0px 1000px #fff inset !important;
+      -webkit-text-fill-color: var(--text) !important;
+      border-color: var(--border) !important;
+      transition: background-color 5000s ease-in-out 0s;
+    }
     .btn { width: 100%; padding: 16px; border: none; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.2s; font-family: 'Inter', sans-serif; }
     .btn-primary { background: var(--teal); color: #fff; }
     .btn-primary:hover { background: var(--teal-dark); }
@@ -341,7 +349,7 @@
              onkeydown="if(event.key==='Enter')authLogin()"/>
     </div>
     <button class="btn btn-primary" id="loginBtn" onclick="authLogin()" style="margin-bottom:12px;">Sign In</button>
-    <div class="auth-switch" style="margin-bottom:8px;">No account? <a class="auth-link" onclick="showAuthScreen('authRegister')">Create one (Parent A)</a></div>
+    <div class="auth-switch" style="margin-bottom:8px;">No account? <a class="auth-link" onclick="showAuthScreen('authRegister')">Create one</a></div>
     <div class="auth-switch">Joining with an invite code? <a class="auth-link" onclick="showAuthScreen('authJoin')">Join here</a></div>
     <div class="auth-switch" style="margin-top:8px;"><a class="auth-link" onclick="showAuthScreen('authForgot')">Forgot password?</a></div>
   </div>
@@ -349,7 +357,7 @@
   <!-- REGISTER (Parent A) -->
   <div class="auth-card" id="authRegister" style="display:none;">
     <h2>👋 Create your account</h2>
-    <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px;">You'll be Parent A. You'll get an invite code to share with the other parent.</p>
+    <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px;">Set up your family's shared portal. Once you're in, you'll get a simple code to share with the other parent so they can join.</p>
     <div class="auth-error" id="registerError"></div>
     <div class="form-group">
       <label>Your full name</label>
