@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
-  <title>Kinnect — Together for your child</title>
-  <meta name="description" content="Kinnect — the respectful co-parenting app. Manage schedules, log daily updates, and communicate calmly."/>
+  <title>CoKinnect — Together for your child</title>
+  <meta name="description" content="CoKinnect — the respectful co-parenting app. Manage schedules, log daily updates, and communicate calmly."/>
   <meta name="theme-color" content="#0d9488"/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-  <meta name="apple-mobile-web-app-title" content="Kinnect"/>
+  <meta name="apple-mobile-web-app-title" content="CoKinnect"/>
   <link rel="apple-touch-icon" href="icon-192.png"/>
   <link rel="manifest" href="manifest.json"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
@@ -215,6 +215,20 @@
     .toast { position: fixed; top: 80px; left: 50%; transform: translateX(-50%) translateY(-20px); background: #1e293b; color: #fff; padding: 12px 20px; border-radius: 100px; font-size: 14px; font-weight: 500; opacity: 0; transition: all 0.3s; z-index: 300; white-space: nowrap; pointer-events: none; }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
+    /* ── AUTH LOADING + ERROR ── */
+    .auth-error { background: #fee2e2; border: 1px solid #fecaca; color: #991b1b; border-radius: 10px; padding: 12px 14px; font-size: 13px; font-weight: 500; margin-bottom: 16px; display: none; }
+    .auth-error.show { display: block; }
+    .auth-success { background: #d1fae5; border: 1px solid #a7f3d0; color: #065f46; border-radius: 10px; padding: 12px 14px; font-size: 13px; font-weight: 500; margin-bottom: 16px; display: none; }
+    .auth-success.show { display: block; }
+    .btn-loading { position: relative; pointer-events: none; opacity: 0.75; }
+    .btn-loading::after { content: ''; position: absolute; right: 16px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; }
+    @keyframes spin { to { transform: translateY(-50%) rotate(360deg); } }
+    .invite-code-display { background: #f0fdf4; border: 2px dashed #86efac; border-radius: 16px; padding: 24px; text-align: center; margin-bottom: 20px; }
+    .invite-code-display .code-label { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; }
+    .invite-code-display .code-value { font-size: 40px; font-weight: 800; letter-spacing: 8px; color: var(--teal); font-variant-numeric: tabular-nums; }
+    .auth-link { color: var(--teal); font-weight: 600; cursor: pointer; text-decoration: none; }
+    .auth-link:hover { text-decoration: underline; }
+
     /* ── MISC ── */
     .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
     .section-title-lg { font-size: 20px; font-weight: 800; }
@@ -309,61 +323,112 @@
 <div class="auth-screen" id="authScreen">
   <div class="auth-logo">
     <div class="auth-logo-icon">🤝</div>
-    <h1>Kinnect</h1>
+    <h1>CoKinnect</h1>
     <p>Together for your child</p>
   </div>
-  <div class="auth-card" id="loginCard">
+
+  <!-- LOGIN -->
+  <div class="auth-card" id="authLogin">
     <h2>Welcome back</h2>
+    <div class="auth-error" id="loginError"></div>
     <div class="form-group">
-      <label>Who are you?</label>
-      <div class="parent-select">
-        <div class="parent-opt" id="optA" onclick="selectParent('A')">
-          <div class="emoji">👩</div>
-          <div class="label" style="color:var(--parent-a);">Parent A</div>
-        </div>
-        <div class="parent-opt" id="optB" onclick="selectParent('B')">
-          <div class="emoji">👨</div>
-          <div class="label" style="color:var(--parent-b);">Parent B</div>
-        </div>
-      </div>
+      <label>Email address</label>
+      <input type="email" id="loginEmail" placeholder="you@example.com" autocomplete="email"/>
     </div>
     <div class="form-group">
       <label>Password</label>
-      <input type="password" id="passwordInput" placeholder="Enter your password"/>
+      <input type="password" id="loginPassword" placeholder="Your password" autocomplete="current-password"
+             onkeydown="if(event.key==='Enter')authLogin()"/>
     </div>
-    <button class="btn btn-primary" onclick="login()" style="margin-bottom:12px;">Sign In</button>
-    <div class="auth-switch">New here? <a onclick="showSetup()">Set up your account</a></div>
+    <button class="btn btn-primary" id="loginBtn" onclick="authLogin()" style="margin-bottom:12px;">Sign In</button>
+    <div class="auth-switch" style="margin-bottom:8px;">No account? <a class="auth-link" onclick="showAuthScreen('authRegister')">Create one (Parent A)</a></div>
+    <div class="auth-switch">Joining with an invite code? <a class="auth-link" onclick="showAuthScreen('authJoin')">Join here</a></div>
+    <div class="auth-switch" style="margin-top:8px;"><a class="auth-link" onclick="showAuthScreen('authForgot')">Forgot password?</a></div>
   </div>
-  <!-- Setup card (hidden by default) -->
-  <div class="auth-card" id="setupCard" style="display:none;">
-    <h2>Set up Kinnect</h2>
+
+  <!-- REGISTER (Parent A) -->
+  <div class="auth-card" id="authRegister" style="display:none;">
+    <h2>👋 Create your account</h2>
+    <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px;">You'll be Parent A. You'll get an invite code to share with the other parent.</p>
+    <div class="auth-error" id="registerError"></div>
     <div class="form-group">
-      <label>Your name</label>
-      <input type="text" id="setupName" placeholder="e.g. Sarah"/>
+      <label>Your full name</label>
+      <input type="text" id="regName" placeholder="e.g. Sarah Johnson" autocomplete="name"/>
     </div>
     <div class="form-group">
-      <label>You are...</label>
-      <div class="parent-select">
-        <div class="parent-opt" id="setupOptA" onclick="selectSetupParent('A')">
-          <div class="emoji">👩</div>
-          <div class="label" style="color:var(--parent-a);">Parent A</div>
-        </div>
-        <div class="parent-opt" id="setupOptB" onclick="selectSetupParent('B')">
-          <div class="emoji">👨</div>
-          <div class="label" style="color:var(--parent-b);">Parent B</div>
-        </div>
-      </div>
+      <label>Email address</label>
+      <input type="email" id="regEmail" placeholder="you@example.com" autocomplete="email"/>
+    </div>
+    <div class="form-group">
+      <label>Password <span style="font-weight:400;color:var(--text-muted);">(min 8 characters)</span></label>
+      <input type="password" id="regPassword" placeholder="Choose a strong password" autocomplete="new-password"/>
     </div>
     <div class="form-group">
       <label>Child's name</label>
-      <input type="text" id="setupChild" placeholder="e.g. Olivia"/>
+      <input type="text" id="regChildName" placeholder="e.g. Olivia"/>
     </div>
     <div class="form-group">
-      <label>Set your password</label>
-      <input type="password" id="setupPass" placeholder="Choose a password"/>
+      <label>Child's date of birth <span style="font-weight:400;color:var(--text-muted);">(optional)</span></label>
+      <input type="date" id="regChildDob"/>
     </div>
-    <button class="btn btn-primary" onclick="setupAccount()" style="margin-bottom:12px;">Create Account</button>
-    <div class="auth-switch"><a onclick="showLogin()">Already set up? Sign in</a></div>
+    <button class="btn btn-primary" id="registerBtn" onclick="authRegister()" style="margin-bottom:12px;">Create Account</button>
+    <div class="auth-switch">Already have an account? <a class="auth-link" onclick="showAuthScreen('authLogin')">Sign in</a></div>
+  </div>
+
+  <!-- JOIN (Parent B) -->
+  <div class="auth-card" id="authJoin" style="display:none;">
+    <h2>🔗 Join your family</h2>
+    <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px;">Enter the invite code from the other parent to join your shared portal.</p>
+    <div class="auth-error" id="joinError"></div>
+    <div class="form-group">
+      <label>Your full name</label>
+      <input type="text" id="joinName" placeholder="e.g. James Johnson" autocomplete="name"/>
+    </div>
+    <div class="form-group">
+      <label>Email address</label>
+      <input type="email" id="joinEmail" placeholder="you@example.com" autocomplete="email"/>
+    </div>
+    <div class="form-group">
+      <label>Password <span style="font-weight:400;color:var(--text-muted);">(min 8 characters)</span></label>
+      <input type="password" id="joinPassword" placeholder="Choose a strong password" autocomplete="new-password"/>
+    </div>
+    <div class="form-group">
+      <label>Invite code</label>
+      <input type="text" id="joinInviteCode" placeholder="e.g. AB12CD" autocomplete="off"
+             style="text-transform:uppercase;letter-spacing:4px;font-size:20px;font-weight:700;"
+             oninput="this.value=this.value.toUpperCase()"/>
+    </div>
+    <button class="btn btn-primary" id="joinBtn" onclick="authJoin()" style="margin-bottom:12px;">Join Family</button>
+    <div class="auth-switch">Already have an account? <a class="auth-link" onclick="showAuthScreen('authLogin')">Sign in</a></div>
+    <div class="auth-switch" style="margin-top:6px;">Creating a new family? <a class="auth-link" onclick="showAuthScreen('authRegister')">Register here</a></div>
+  </div>
+
+  <!-- FORGOT PASSWORD -->
+  <div class="auth-card" id="authForgot" style="display:none;">
+    <h2>🔑 Reset password</h2>
+    <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px;">Enter your email and we'll send you a reset link.</p>
+    <div class="auth-error" id="forgotError"></div>
+    <div class="auth-success" id="forgotSuccess">Check your inbox! A reset link has been sent.</div>
+    <div class="form-group">
+      <label>Email address</label>
+      <input type="email" id="forgotEmail" placeholder="you@example.com"/>
+    </div>
+    <button class="btn btn-primary" id="forgotBtn" onclick="authForgot()" style="margin-bottom:12px;">Send Reset Link</button>
+    <div class="auth-switch"><a class="auth-link" onclick="showAuthScreen('authLogin')">Back to sign in</a></div>
+  </div>
+
+  <!-- INVITE CODE DISPLAY (after register) -->
+  <div class="auth-card" id="authInvite" style="display:none;">
+    <h2>🎉 You're all set!</h2>
+    <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px;">Share this invite code with the other parent so they can join your family portal.</p>
+    <div class="invite-code-display">
+      <div class="code-label">Your invite code</div>
+      <div class="code-value" id="newInviteCode">------</div>
+    </div>
+    <button class="btn btn-primary" onclick="copyNewInviteCode()" style="margin-bottom:8px;">📋 Copy Code</button>
+    <button class="btn btn-secondary" onclick="shareNewInviteCode()" style="margin-bottom:16px;">Share via...</button>
+    <p style="font-size:12px;color:var(--text-muted);margin-bottom:16px;">The other parent creates their account and enters this code to join. You can also find this code in Settings.</p>
+    <button class="btn btn-primary" onclick="launchApp()">Continue to App →</button>
   </div>
 </div>
 
@@ -371,7 +436,7 @@
 <div class="app" id="app">
   <!-- Top Bar -->
   <div class="topbar">
-    <div class="topbar-logo">🤝 Kinnect</div>
+    <div class="topbar-logo">🤝 CoKinnect</div>
     <div class="topbar-user">
       <span id="topbarName" style="font-size:13px;font-weight:600;color:var(--text-muted);"></span>
       <div class="avatar" id="topbarAvatar"></div>
@@ -569,7 +634,8 @@
           <label>Your name</label>
           <input type="text" id="settingsName" placeholder="Your name"/>
         </div>
-        <div style="margin-top:16px;">
+        <div style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">Email: <span id="settingsEmailInfo" style="font-weight:600;"></span></div>
+        <div style="margin-top:4px;">
           <button class="btn btn-secondary" onclick="signOut()">Sign Out</button>
         </div>
       </div>
@@ -812,24 +878,32 @@
 
 <script>
 // ══ BACKEND CONFIG ══
-const CONFIG = { apiBase: '', useBackend: false };
+const CONFIG = { apiBase: 'http://localhost:3001', useBackend: false };
 
-async function fetchAPI(endpoint, method = 'GET', body = null) {
+async function fetchAPI(endpoint, method = 'GET', body = null, requiresAuth = false) {
   if (!CONFIG.useBackend) return null;
-  const opts = { method, headers: { 'Content-Type': 'application/json' } };
+  const headers = { 'Content-Type': 'application/json' };
+  if (requiresAuth) {
+    const token = localStorage.getItem('kinnect_token');
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+  }
+  const opts = { method, headers };
   if (body) opts.body = JSON.stringify(body);
   try {
     const res = await fetch(CONFIG.apiBase + endpoint, opts);
-    if (!res.ok) throw new Error(`API ${res.status}`);
-    return await res.json();
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw Object.assign(new Error(data.error || `API ${res.status}`), { status: res.status, data });
+    return data;
   } catch (e) {
-    console.warn('fetchAPI error:', e);
-    return null;
+    throw e;
   }
 }
 
 // ══ STATE ══
 let state = {
+  currentUser: null,     // { id, email, fullName, role }
+  currentFamily: null,   // { id, inviteCode }
+  currentChild: null,    // { id, name }
   currentParent: null,
   parentAName: 'Parent A',
   parentBName: 'Parent B',
@@ -882,48 +956,216 @@ function getParentForDate(date) {
   return pattern[dayKey] || 'A';
 }
 
-// ══ AUTH ══
-let selectedParent = null;
-let setupParent = null;
-
-function selectParent(p) {
-  selectedParent = p;
-  document.getElementById('optA').className = 'parent-opt' + (p === 'A' ? ' selected-a' : '');
-  document.getElementById('optB').className = 'parent-opt' + (p === 'B' ? ' selected-b' : '');
+// ══ AUTH HELPERS ══
+function showAuthScreen(id) {
+  ['authLogin','authRegister','authJoin','authForgot','authInvite'].forEach(s => {
+    const el = document.getElementById(s);
+    if (el) el.style.display = (s === id ? 'block' : 'none');
+  });
+  // Clear errors
+  document.querySelectorAll('.auth-error, .auth-success').forEach(e => e.classList.remove('show'));
 }
 
-function selectSetupParent(p) {
-  setupParent = p;
-  document.getElementById('setupOptA').className = 'parent-opt' + (p === 'A' ? ' selected-a' : '');
-  document.getElementById('setupOptB').className = 'parent-opt' + (p === 'B' ? ' selected-b' : '');
+function setAuthError(id, msg) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.add('show');
 }
 
-function showSetup() {
-  document.getElementById('loginCard').style.display = 'none';
-  document.getElementById('setupCard').style.display = 'block';
-}
-function showLogin() {
-  document.getElementById('setupCard').style.display = 'none';
-  document.getElementById('loginCard').style.display = 'block';
+function clearAuthError(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.remove('show');
 }
 
-function setupAccount() {
-  const name = document.getElementById('setupName').value.trim();
-  const child = document.getElementById('setupChild').value.trim();
-  if (!name || !setupParent || !child) { showToast('Please fill in all fields'); return; }
-  if (setupParent === 'A') state.parentAName = name;
-  else state.parentBName = name;
-  state.childName = child;
-  state.currentParent = setupParent;
-  launchApp();
+function setBtnLoading(btnId, loading) {
+  const btn = document.getElementById(btnId);
+  if (!btn) return;
+  if (loading) btn.classList.add('btn-loading');
+  else btn.classList.remove('btn-loading');
 }
 
-function login() {
-  if (!selectedParent) { showToast('Please select who you are'); return; }
-  state.currentParent = selectedParent;
-  launchApp();
+function persistAuth(token, userData, familyData, childData) {
+  localStorage.setItem('cokinnect_token', token);
+  localStorage.setItem('cokinnect_user', JSON.stringify({ user: userData, family: familyData, child: childData }));
+  // Update state from real user data
+  const role = userData.role; // 'parent_a' or 'parent_b'
+  state.currentParent = role === 'parent_a' ? 'A' : 'B';
+  state.currentUser = userData;
+  state.currentFamily = familyData;
+  state.currentChild = childData;
+  if (role === 'parent_a') state.parentAName = userData.fullName;
+  else state.parentBName = userData.fullName;
+  if (childData?.name) state.childName = childData.name;
 }
 
+// ── DEMO MODE helpers ──────────────────────────────────────────────────────
+function makeDemoToken() {
+  // fake JWT-like token for demo mode
+  const payload = btoa(JSON.stringify({ userId: 'demo_' + Date.now(), exp: Date.now() + 7*86400000 }));
+  return `demo.${payload}.sig`;
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// ── Login ──────────────────────────────────────────────────────────────────
+async function authLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  clearAuthError('loginError');
+
+  if (!email || !password) { setAuthError('loginError', 'Please enter your email and password.'); return; }
+
+  setBtnLoading('loginBtn', true);
+  try {
+    let result;
+    if (CONFIG.useBackend) {
+      result = await fetchAPI('/api/auth/login', 'POST', { email, password });
+    } else {
+      await sleep(800);
+      // Demo mode: accept any credentials, treat email as identifier
+      const stored = localStorage.getItem('cokinnect_demo_users');
+      const demoUsers = stored ? JSON.parse(stored) : {};
+      if (!demoUsers[email]) throw new Error('Invalid email or password');
+      const u = demoUsers[email];
+      if (u.password !== password) throw new Error('Invalid email or password');
+      result = {
+        token: makeDemoToken(),
+        user: { id: u.id, email, fullName: u.fullName, role: u.role },
+        family: { id: u.familyId, inviteCode: u.inviteCode },
+        child: u.child ? { id: u.childId, name: u.childName } : null
+      };
+    }
+    persistAuth(result.token, result.user, result.family, result.child);
+    launchApp();
+  } catch (e) {
+    setAuthError('loginError', e.message || 'Sign in failed. Please try again.');
+  } finally {
+    setBtnLoading('loginBtn', false);
+  }
+}
+
+// ── Register (Parent A) ─────────────────────────────────────────────────────
+async function authRegister() {
+  const fullName = document.getElementById('regName').value.trim();
+  const email = document.getElementById('regEmail').value.trim();
+  const password = document.getElementById('regPassword').value;
+  const childName = document.getElementById('regChildName').value.trim();
+  const childDob = document.getElementById('regChildDob').value;
+  clearAuthError('registerError');
+
+  if (!fullName || !email || !password || !childName) { setAuthError('registerError', 'Please fill in all required fields.'); return; }
+  if (password.length < 8) { setAuthError('registerError', 'Password must be at least 8 characters.'); return; }
+
+  setBtnLoading('registerBtn', true);
+  try {
+    let result;
+    if (CONFIG.useBackend) {
+      result = await fetchAPI('/api/auth/register', 'POST', { email, password, fullName, childName, childDob });
+    } else {
+      await sleep(900);
+      const stored = localStorage.getItem('cokinnect_demo_users');
+      const demoUsers = stored ? JSON.parse(stored) : {};
+      if (demoUsers[email]) throw new Error('An account with this email already exists.');
+      const userId = 'user_' + Date.now();
+      const familyId = 'fam_' + Date.now();
+      const inviteCode = 'DEMO' + Math.random().toString(36).substring(2,4).toUpperCase();
+      demoUsers[email] = { id: userId, password, fullName, role: 'parent_a', familyId, inviteCode, childId: 'ch_'+Date.now(), childName };
+      localStorage.setItem('cokinnect_demo_users', JSON.stringify(demoUsers));
+      result = {
+        token: makeDemoToken(),
+        user: { id: userId, email, fullName, role: 'parent_a' },
+        family: { id: familyId, inviteCode },
+        child: { id: 'ch_'+Date.now(), name: childName }
+      };
+    }
+    persistAuth(result.token, result.user, result.family, result.child);
+    // Show invite code screen
+    document.getElementById('newInviteCode').textContent = result.family?.inviteCode || '------';
+    showAuthScreen('authInvite');
+  } catch (e) {
+    setAuthError('registerError', e.message || 'Registration failed. Please try again.');
+  } finally {
+    setBtnLoading('registerBtn', false);
+  }
+}
+
+// ── Join (Parent B) ─────────────────────────────────────────────────────────
+async function authJoin() {
+  const fullName = document.getElementById('joinName').value.trim();
+  const email = document.getElementById('joinEmail').value.trim();
+  const password = document.getElementById('joinPassword').value;
+  const inviteCode = document.getElementById('joinInviteCode').value.trim().toUpperCase();
+  clearAuthError('joinError');
+
+  if (!fullName || !email || !password || !inviteCode) { setAuthError('joinError', 'Please fill in all fields.'); return; }
+  if (password.length < 8) { setAuthError('joinError', 'Password must be at least 8 characters.'); return; }
+
+  setBtnLoading('joinBtn', true);
+  try {
+    let result;
+    if (CONFIG.useBackend) {
+      result = await fetchAPI('/api/auth/join', 'POST', { email, password, fullName, inviteCode });
+    } else {
+      await sleep(900);
+      const stored = localStorage.getItem('cokinnect_demo_users');
+      const demoUsers = stored ? JSON.parse(stored) : {};
+      // Find the Parent A with this invite code
+      const parentA = Object.values(demoUsers).find(u => u.inviteCode === inviteCode && u.role === 'parent_a');
+      if (!parentA) throw new Error('Invalid invite code. Please check with the other parent.');
+      if (demoUsers[email]) throw new Error('An account with this email already exists.');
+      const userId = 'user_' + Date.now();
+      demoUsers[email] = { id: userId, password, fullName, role: 'parent_b', familyId: parentA.familyId, inviteCode: parentA.inviteCode, childId: parentA.childId, childName: parentA.childName };
+      localStorage.setItem('cokinnect_demo_users', JSON.stringify(demoUsers));
+      result = {
+        token: makeDemoToken(),
+        user: { id: userId, email, fullName, role: 'parent_b' },
+        family: { id: parentA.familyId },
+        child: { id: parentA.childId, name: parentA.childName }
+      };
+    }
+    persistAuth(result.token, result.user, result.family, result.child);
+    launchApp();
+  } catch (e) {
+    setAuthError('joinError', e.message || 'Failed to join. Please try again.');
+  } finally {
+    setBtnLoading('joinBtn', false);
+  }
+}
+
+// ── Forgot Password ──────────────────────────────────────────────────────────
+async function authForgot() {
+  const email = document.getElementById('forgotEmail').value.trim();
+  clearAuthError('forgotError');
+  if (!email) { setAuthError('forgotError', 'Please enter your email address.'); return; }
+  setBtnLoading('forgotBtn', true);
+  await sleep(1000);
+  setBtnLoading('forgotBtn', false);
+  document.getElementById('forgotSuccess').classList.add('show');
+  document.getElementById('forgotEmail').value = '';
+}
+
+// ── Invite code helpers ──────────────────────────────────────────────────────
+function copyNewInviteCode() {
+  const code = document.getElementById('newInviteCode')?.textContent;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(code).then(() => showToast('Invite code copied ✓'));
+  } else {
+    showToast('Code: ' + code);
+  }
+}
+
+function shareNewInviteCode() {
+  const code = document.getElementById('newInviteCode')?.textContent;
+  const text = `Join me on CoKinnect! Use invite code: ${code} to set up your account.`;
+  if (navigator.share) {
+    navigator.share({ title: 'CoKinnect Invite', text });
+  } else {
+    copyNewInviteCode();
+  }
+}
+
+// ── Launch App ───────────────────────────────────────────────────────────────
 function launchApp() {
   document.getElementById('authScreen').style.display = 'none';
   document.getElementById('app').classList.add('visible');
@@ -934,10 +1176,23 @@ function launchApp() {
 function initApp() {
   const p = state.currentParent;
   const name = p === 'A' ? state.parentAName : state.parentBName;
+  // Topbar: show real name + role badge
+  const roleLabel = p === 'A' ? 'Parent A' : 'Parent B';
   document.getElementById('topbarName').textContent = name;
+  document.getElementById('topbarName').title = roleLabel;
   const avatar = document.getElementById('topbarAvatar');
   avatar.textContent = name[0].toUpperCase();
   avatar.className = `avatar avatar-${p.toLowerCase()}`;
+  // Update invite code in settings with real data
+  const inviteEl = document.getElementById('inviteCode');
+  if (inviteEl && state.currentFamily?.inviteCode) {
+    inviteEl.textContent = state.currentFamily.inviteCode;
+  }
+  // Update child name in settings
+  const childDobEl = document.getElementById('settingsChildDob');
+  if (childDobEl && state.currentChild?.dateOfBirth) {
+    childDobEl.value = state.currentChild.dateOfBirth.split('T')[0];
+  }
   renderHome();
   renderMessages();
   renderLog();
@@ -1415,7 +1670,7 @@ function printMonthlyReport() {
   const courtHeader = courtExport ? `
     <div style="border:2px solid #000;padding:16px;margin-bottom:24px;background:#f9f9f9;">
       <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;">OFFICIAL RECORD — CO-PARENTING LOG</div>
-      <div style="font-size:13px;">This document is an official record exported from Kinnect. All entries are recorded as submitted by the named parents. This document has not been altered after export.</div>
+      <div style="font-size:13px;">This document is an official record exported from CoKinnect. All entries are recorded as submitted by the named parents. This document has not been altered after export.</div>
       <div style="margin-top:8px;font-size:12px;">Export timestamp: <strong>${generatedAt}</strong></div>
     </div>` : '';
 
@@ -1428,11 +1683,11 @@ function printMonthlyReport() {
       This record is provided for legal and co-parenting purposes. Any modification to this document after export invalidates its integrity.
     </div>` : `
     <div style="margin-top:32px;font-size:11px;color:#aaa;border-top:1px solid #eee;padding-top:16px;">
-      Generated by Kinnect &mdash; ${generatedDisplay}
+      Generated by CoKinnect &mdash; ${generatedDisplay}
     </div>`;
 
   const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"/>
-    <title>${courtExport ? 'OFFICIAL RECORD ' : ''}Kinnect Log Report — ${monthLabel}</title>
+    <title>${courtExport ? 'OFFICIAL RECORD ' : ''}CoKinnect Log Report — ${monthLabel}</title>
     <style>
       body { font-family: Arial, sans-serif; padding: 32px; color: #111; }
       h1 { font-size: 24px; margin-bottom: 4px; }
@@ -1443,7 +1698,7 @@ function printMonthlyReport() {
     </style>
   </head><body>
     ${courtHeader}
-    <h1>${courtExport ? '⚖️ OFFICIAL: ' : '🤝 '} Kinnect — Daily Log Report</h1>
+    <h1>${courtExport ? '⚖️ OFFICIAL: ' : '🤝 '} CoKinnect — Daily Log Report</h1>
     <div class="meta">
       Child: <strong>${child}</strong> &nbsp;·&nbsp;
       Period: <strong>${monthLabel}</strong> &nbsp;·&nbsp;
@@ -1683,9 +1938,9 @@ function copyInviteCode() {
 
 function shareInviteCode() {
   const code = document.getElementById('inviteCode')?.textContent;
-  const text = `Join me on Kinnect! Use invite code: ${code} to set up your account at https://petenorman3011-ship-it.github.io/kinnect-app/`;
+  const text = `Join me on CoKinnect! Use invite code: ${code} to set up your account at https://petenorman3011-ship-it.github.io/cokinnect-app/`;
   if (navigator.share) {
-    navigator.share({ title: 'Kinnect Invite', text });
+    navigator.share({ title: 'CoKinnect Invite', text });
   } else {
     copyInviteCode();
     showToast('Link copied ✓ — paste it to share');
@@ -1693,9 +1948,15 @@ function shareInviteCode() {
 }
 
 function signOut() {
+  localStorage.removeItem('cokinnect_token');
+  localStorage.removeItem('cokinnect_user');
+  state.currentParent = null;
+  state.currentUser = null;
+  state.currentFamily = null;
+  state.currentChild = null;
   document.getElementById('app').classList.remove('visible');
   document.getElementById('authScreen').style.display = 'flex';
-  state.currentParent = null;
+  showAuthScreen('authLogin');
 }
 
 function initSettings() {
@@ -1705,6 +1966,16 @@ function initSettings() {
   const sc = document.getElementById('settingsChildName');
   if (sn) sn.value = name || '';
   if (sc) sc.value = state.childName || '';
+  // Show real invite code if available
+  const inviteEl = document.getElementById('inviteCode');
+  if (inviteEl && state.currentFamily?.inviteCode) {
+    inviteEl.textContent = state.currentFamily.inviteCode;
+  }
+  // Show email in account section
+  if (state.currentUser?.email) {
+    const emailInfo = document.getElementById('settingsEmailInfo');
+    if (emailInfo) emailInfo.textContent = state.currentUser.email;
+  }
 }
 
 // ══ NAV ══
@@ -1865,6 +2136,26 @@ window.addEventListener('load', () => {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js').catch(() => {});
   }
+
+  // ── Check localStorage for existing session ──
+  const token = localStorage.getItem('cokinnect_token');
+  const userRaw = localStorage.getItem('cokinnect_user');
+  if (token && userRaw) {
+    try {
+      const { user, family, child } = JSON.parse(userRaw);
+      if (user && user.role) {
+        persistAuth(token, user, family, child);
+        launchApp();
+        return; // skip auth screen
+      }
+    } catch (e) {
+      // corrupted storage, fall through to auth
+      localStorage.removeItem('cokinnect_token');
+      localStorage.removeItem('cokinnect_user');
+    }
+  }
+  // No valid session — show auth screen
+  showAuthScreen('authLogin');
 });
 
 // PWA install prompt
@@ -1900,7 +2191,7 @@ window.addEventListener('appinstalled', () => {
 <div id="installBanner" style="display:none;position:fixed;bottom:80px;left:50%;transform:translateX(-50%);width:calc(100% - 32px);max-width:448px;background:#fff;border:1.5px solid #e2e8f0;border-radius:16px;padding:14px 16px;display:none;align-items:center;gap:12px;box-shadow:0 8px 32px rgba(0,0,0,0.12);z-index:200;">
   <span style="font-size:28px;">🤝</span>
   <div style="flex:1;">
-    <div style="font-size:14px;font-weight:700;color:#0f172a;">Add Kinnect to your home screen</div>
+    <div style="font-size:14px;font-weight:700;color:#0f172a;">Add CoKinnect to your home screen</div>
     <div style="font-size:12px;color:#64748b;">For the best app experience</div>
   </div>
   <button onclick="installApp()" style="background:#0d9488;color:#fff;border:none;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;">Install</button>

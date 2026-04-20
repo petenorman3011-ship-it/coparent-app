@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy Policy — CoKinnect</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --teal: #0d9488;
+      --teal-light: #ccfbf1;
+      --teal-dark: #0f766e;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --bg: #f8fafc;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      font-size: 16px;
+    }
+
+    header {
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    header a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text);
+    }
+
+    .logo {
+      width: 36px;
+      height: 36px;
+      background: var(--teal);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    .logo-name {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--teal);
+    }
+
+    main {
+      max-width: 760px;
+      margin: 48px auto;
+      padding: 0 24px 80px;
+    }
+
+    .page-title {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .updated {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 40px;
+    }
+
+    .intro-box {
+      background: var(--teal-light);
+      border-left: 4px solid var(--teal);
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 40px;
+      font-size: 15px;
+      color: #134e4a;
+    }
+
+    h2 {
+      font-size: 20px;
+      font-weight: 700;
+      margin: 40px 0 12px;
+      color: var(--teal-dark);
+    }
+
+    h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin: 24px 0 8px;
+    }
+
+    p { margin-bottom: 12px; }
+
+    ul, ol {
+      margin: 8px 0 16px 24px;
+    }
+
+    li { margin-bottom: 6px; }
+
+    .badge {
+      display: inline-block;
+      background: var(--teal-light);
+      color: var(--teal-dark);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 2px 10px;
+      border-radius: 99px;
+      margin-bottom: 8px;
+    }
+
+    .contact-box {
+      background: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin-top: 40px;
+    }
+
+    .contact-box p { margin-bottom: 4px; }
+
+    footer {
+      text-align: center;
+      padding: 32px 24px;
+      font-size: 13px;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+    }
+
+    footer a { color: var(--teal); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+<header>
+  <a href="index.html">
+    <div class="logo">🤝</div>
+    <span class="logo-name">CoKinnect</span>
+  </a>
+</header>
+
+<main>
+  <div class="page-title">Privacy Policy</div>
+  <p class="updated">Last updated: 20 April 2026 &nbsp;·&nbsp; CoKinnect Ltd</p>
+
+  <div class="intro-box">
+    CoKinnect is built for families. We take the privacy of your data — and especially your children's data — seriously. This policy explains exactly what we collect, why, and how we protect it.
+  </div>
+
+  <h2>1. Who We Are</h2>
+  <p>CoKinnect Ltd is a company registered in England and Wales. We operate the CoKinnect co-parenting communication platform ("the Service"). For data protection purposes, we are the <strong>data controller</strong>.</p>
+  <p>Contact: <a href="mailto:hello@cokinnect.com">hello@cokinnect.com</a></p>
+
+  <h2>2. What Data We Collect</h2>
+
+  <h3>2.1 Account Information</h3>
+  <ul>
+    <li>Full name and email address</li>
+    <li>Password (stored as a one-way bcrypt hash — we never see your plaintext password)</li>
+    <li>Account role (Parent A or Parent B) and family pairing code</li>
+  </ul>
+
+  <h3>2.2 Child Information</h3>
+  <span class="badge">Special Category Data</span>
+  <ul>
+    <li>Child's name and date of birth</li>
+    <li>Allergies and medical notes</li>
+    <li>Doctor and emergency contact details</li>
+  </ul>
+  <p>This is classified as <strong>special category data</strong> under UK GDPR Article 9. We process it solely for the purpose of facilitating safe, effective co-parenting communication between verified parents.</p>
+
+  <h3>2.3 Communications & Logs</h3>
+  <ul>
+    <li>Messages sent between parents within the platform</li>
+    <li>Daily log entries (meals, naps, mood, medication, notes)</li>
+    <li>Schedule patterns and change requests</li>
+    <li>Photos uploaded to the platform (Premium users)</li>
+  </ul>
+
+  <h3>2.4 Subscription & Payment Data</h3>
+  <ul>
+    <li>Subscription tier and status</li>
+    <li>Stripe customer and subscription IDs</li>
+    <li><strong>We never store card details.</strong> All payment processing is handled by Stripe (PCI DSS Level 1 certified)</li>
+  </ul>
+
+  <h3>2.5 Technical Data</h3>
+  <ul>
+    <li>IP address and device type (for security and fraud prevention)</li>
+    <li>App usage patterns (aggregated, anonymised)</li>
+    <li>Error logs and crash reports</li>
+  </ul>
+
+  <h2>3. Why We Collect It (Legal Basis)</h2>
+  <ul>
+    <li><strong>Contract performance</strong> — to provide the co-parenting service you signed up for</li>
+    <li><strong>Legitimate interests</strong> — to keep the platform secure, prevent abuse, and improve the service</li>
+    <li><strong>Legal obligation</strong> — to comply with applicable law (e.g. financial records)</li>
+    <li><strong>Explicit consent</strong> — where required for special category data relating to children</li>
+  </ul>
+
+  <h2>4. How We Store and Protect Your Data</h2>
+  <ul>
+    <li>All data is stored on servers located in the <strong>UK or European Economic Area</strong></li>
+    <li>Data is encrypted <strong>in transit</strong> (TLS 1.2+) and <strong>at rest</strong> (AES-256)</li>
+    <li>Passwords are hashed using bcrypt with a cost factor of 12</li>
+    <li>Access to production data is restricted to authorised personnel only</li>
+    <li>We conduct regular security reviews and keep dependencies up to date</li>
+  </ul>
+
+  <h2>5. Children's Data</h2>
+  <p>CoKinnect processes data <em>about</em> children (their name, health information, daily routines) but our platform is used <em>by</em> adults — parents and legal guardians only. We do not knowingly allow children to create accounts or access the platform directly.</p>
+  <p>Children's data is processed on the basis of <strong>explicit consent</strong> provided by the registering parent, who confirms they have the legal right to share this information. Both parents in a family unit have access to the shared child profile.</p>
+  <p>If you believe a child's data has been processed without proper authority, please contact us at <a href="mailto:hello@cokinnect.com">hello@cokinnect.com</a> immediately.</p>
+
+  <h2>6. Who We Share Data With</h2>
+  <p>We do not sell your data. We share it only with trusted third-party processors under appropriate data processing agreements:</p>
+  <ul>
+    <li><strong>Stripe</strong> — payment processing (see <a href="https://stripe.com/gb/privacy" target="_blank">Stripe's Privacy Policy</a>)</li>
+    <li><strong>Cloud infrastructure provider</strong> — hosting and storage (UK/EU servers)</li>
+    <li><strong>Error monitoring</strong> — anonymised crash reports only</li>
+  </ul>
+  <p>We may disclose data if required by law, court order, or to protect the safety of a child.</p>
+
+  <h2>7. Data Retention</h2>
+  <ul>
+    <li><strong>Active accounts:</strong> data is retained for as long as your account is active</li>
+    <li><strong>Deleted accounts:</strong> personal data is deleted within 30 days of account deletion, except where we are legally required to retain it (e.g. financial records for 6 years)</li>
+    <li><strong>Messages and logs:</strong> retained for the life of the family account; both parents must request deletion</li>
+  </ul>
+
+  <h2>8. Your Rights (UK GDPR)</h2>
+  <p>You have the right to:</p>
+  <ul>
+    <li><strong>Access</strong> — request a copy of your personal data</li>
+    <li><strong>Rectification</strong> — correct inaccurate data</li>
+    <li><strong>Erasure</strong> — request deletion of your data ("right to be forgotten")</li>
+    <li><strong>Restriction</strong> — ask us to limit processing in certain circumstances</li>
+    <li><strong>Portability</strong> — receive your data in a machine-readable format</li>
+    <li><strong>Object</strong> — object to processing based on legitimate interests</li>
+    <li><strong>Withdraw consent</strong> — at any time, where processing is consent-based</li>
+  </ul>
+  <p>To exercise any of these rights, email <a href="mailto:hello@cokinnect.com">hello@cokinnect.com</a>. We will respond within 30 days. You also have the right to lodge a complaint with the <strong>Information Commissioner's Office (ICO)</strong> at <a href="https://ico.org.uk" target="_blank">ico.org.uk</a>.</p>
+
+  <h2>9. Cookies</h2>
+  <p>CoKinnect is a web app that uses <strong>localStorage</strong> to store your authentication token on your device. We do not use third-party tracking cookies or advertising cookies.</p>
+
+  <h2>10. Changes to This Policy</h2>
+  <p>We may update this policy from time to time. We'll notify you of significant changes via the app or by email. The "Last updated" date at the top of this page will always reflect the most recent revision.</p>
+
+  <div class="contact-box">
+    <strong>Contact Us</strong>
+    <p>CoKinnect Ltd</p>
+    <p>Email: <a href="mailto:hello@cokinnect.com">hello@cokinnect.com</a></p>
+    <p>Registered in England and Wales</p>
+  </div>
+</main>
+
+<footer>
+  <p>© 2026 CoKinnect Ltd · <a href="privacy.html">Privacy Policy</a> · <a href="terms.html">Terms of Service</a> · <a href="index.html">Back to App</a></p>
+</footer>
+
+</body>
+</html>
