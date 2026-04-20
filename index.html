@@ -948,8 +948,8 @@ let state = {
   currentFamily: null,   // { id, inviteCode }
   currentChild: null,    // { id, name }
   currentParent: null,
-  parentAName: 'Mam',
-  parentBName: 'Dad',
+  parentAName: localStorage.getItem('ck_labelA') || 'Mam',
+  parentBName: localStorage.getItem('ck_labelB') || 'Dad',
   childName: 'your child',
   messages: [
     { id: 1, from: 'B', text: 'Just to let you know, she had a great day at nursery today 😊', time: '10:32' },
@@ -2090,6 +2090,9 @@ function updateParentLabel(parent) {
   if (!val) return;
   if (parent === 'A') state.parentAName = val;
   else state.parentBName = val;
+  // Persist to localStorage
+  localStorage.setItem('ck_labelA', state.parentAName);
+  localStorage.setItem('ck_labelB', state.parentBName);
   renderScheduleBuilder();
   renderHome();
   const la = document.getElementById('legendA');
