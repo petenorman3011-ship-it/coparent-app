@@ -4,6 +4,13 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
   <title>Kinnect — Together for your child</title>
+  <meta name="description" content="Kinnect — the respectful co-parenting app. Manage schedules, log daily updates, and communicate calmly."/>
+  <meta name="theme-color" content="#0d9488"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="Kinnect"/>
+  <link rel="apple-touch-icon" href="icon-192.png"/>
+  <link rel="manifest" href="manifest.json"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -1847,13 +1854,57 @@ function renderMeds() {
 }
 
 // ══ INIT ══
-// Hide compose bar initially
 window.addEventListener('load', () => {
+  // Hide compose bar initially
   setTimeout(() => {
     const compose = document.getElementById('composeBar');
     if (compose) compose.style.display = 'none';
   }, 100);
+
+  // Register service worker for offline/PWA support
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  }
+});
+
+// PWA install prompt
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  // Show a subtle install banner after 3 seconds if not already installed
+  setTimeout(() => {
+    const banner = document.getElementById('installBanner');
+    if (banner) banner.style.display = 'flex';
+  }, 3000);
+});
+
+function installApp() {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(() => {
+      deferredPrompt = null;
+      const banner = document.getElementById('installBanner');
+      if (banner) banner.style.display = 'none';
+    });
+  }
+}
+
+window.addEventListener('appinstalled', () => {
+  const banner = document.getElementById('installBanner');
+  if (banner) banner.style.display = 'none';
 });
 </script>
+
+<!-- PWA Install Banner -->
+<div id="installBanner" style="display:none;position:fixed;bottom:80px;left:50%;transform:translateX(-50%);width:calc(100% - 32px);max-width:448px;background:#fff;border:1.5px solid #e2e8f0;border-radius:16px;padding:14px 16px;display:none;align-items:center;gap:12px;box-shadow:0 8px 32px rgba(0,0,0,0.12);z-index:200;">
+  <span style="font-size:28px;">🤝</span>
+  <div style="flex:1;">
+    <div style="font-size:14px;font-weight:700;color:#0f172a;">Add Kinnect to your home screen</div>
+    <div style="font-size:12px;color:#64748b;">For the best app experience</div>
+  </div>
+  <button onclick="installApp()" style="background:#0d9488;color:#fff;border:none;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;">Install</button>
+  <button onclick="document.getElementById('installBanner').style.display='none'" style="background:none;border:none;font-size:18px;color:#94a3b8;cursor:pointer;padding:4px;">✕</button>
+</div>
 </body>
 </html>
