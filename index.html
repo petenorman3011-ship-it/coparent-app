@@ -1321,7 +1321,18 @@ function renderInsights() {
 }
 
 // ══ MESSAGES ══
-const FLAGGED_WORDS = ['stupid','idiot','useless','hate','bloody','hell','damn','bastard','moron','liar','always','never','your fault','you never','you always','pathetic','disgusting','selfish','manipulative','abusive','threatening'];
+const FLAGGED_WORDS = [
+  // Swearing
+  'fuck','fucking','fucker','shit','shite','crap','bitch','bastard','bollocks','wanker','twat','piss','arse','ass','dick','cock','prick','slag','cow','whore',
+  // Insults
+  'stupid','idiot','useless','moron','pathetic','disgusting','worthless','loser','scum','trash','horrible','vile','creep','psycho','mental','lunatic','freak',
+  // Threats / abuse
+  'hate you','kill','hurt you','come after','i will find','threatening','abusive',
+  // Blame language
+  'your fault','always your','never your','you never','you always','you always','you never',
+  // Manipulation
+  'selfish','manipulative','liar','lying','cheater','you ruin','ruined everything'
+];
 
 function moderateMessage(text) {
   const lower = text.toLowerCase();
@@ -1388,8 +1399,8 @@ function sendMessage() {
       <div class="mod-actions" style="flex-wrap:wrap;gap:6px;">
         <button class="btn btn-secondary btn-sm" onclick="document.getElementById('${warningId}').remove();">Edit message</button>
         <button class="btn btn-sm" style="background:#d1fae5;color:#065f46;" onclick="useRewrite('${warningId}')">&#x2728; Use suggested rewrite</button>
-        <button class="btn btn-sm" style="background:#fee2e2;color:#991b1b;" onclick="forceSend('${safeText}','${warningId}')">Send anyway</button>
       </div>
+      <p style="font-size:11px;color:#991b1b;margin-top:10px;">Messages containing abusive or inappropriate language cannot be sent. Please rewrite your message respectfully.</p>
     </div>`;
     list.insertAdjacentHTML('beforeend', warningHtml);
     list.scrollTop = list.scrollHeight;
@@ -1414,11 +1425,6 @@ function useRewrite(warningId) {
   document.getElementById(warningId)?.remove();
 }
 
-
-function forceSend(text, warningId) {
-  document.getElementById(warningId)?.remove();
-  pushMessage(text);
-}
 
 function pushMessage(text) {
   const now = new Date();
