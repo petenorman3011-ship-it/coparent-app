@@ -1,4 +1,4 @@
-const CACHE = 'kinnect-v1';
+const CACHE = 'cokinnect-v5';
 const ASSETS = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {
