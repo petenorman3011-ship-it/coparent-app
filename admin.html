@@ -630,8 +630,8 @@
 <script>
 // ══ CONFIG ══
 const CONFIG = {
-  apiBase: '',
-  useBackend: false
+  apiBase: 'https://api-production-b188.up.railway.app',
+  useBackend: true
 };
 
 // ══ AUTH ══
@@ -1142,16 +1142,59 @@ function drawPieChart() {
 }
 
 // ══ LIVE DATA (when useBackend = true) ══
+const ADMIN_KEY = 'KinnectAdmin2026';
+
+async function adminFetch(endpoint) {
+  const res = await fetch(CONFIG.apiBase + endpoint, {
+    headers: { 'x-admin-key': ADMIN_KEY }
+  });
+  return res.json();
+}
+
 async function fetchLiveData() {
   try {
-    const res = await fetch(CONFIG.apiBase + '/api/admin/stats');
-    const d = await res.json();
-    document.getElementById('statFamilies').textContent = d.families ?? '–';
-    document.getElementById('statSubs').textContent = d.subscriptions ?? '–';
-    document.getElementById('statRevenue').textContent = d.mrr ? '£'+d.mrr.toFixed(2) : '–';
-    document.getElementById('statChurn').textContent = d.churn ? d.churn+'%' : '–';
+    // Stats
+    const stats = await adminFetch('/api/admin/stats');
+    document.getElementById('statFamilies').textContent = stats.families ?? 0;
+    document.getElementById('statSubs').textContent = stats.subscriptions ?? 0;
+    document.getElementById('statRevenue').textContent = stats.mrr ? '£' + stats.mrr.toFixed(2) : '£0.00';
+    document.getElementById('statChurn').textContent = (stats.churn || 0) + '%';
+
+    // Families table
+    const families = await adminFetch('/api/admin/families');
+    const tbody = document.getElementById('familiesBody');
+    if (tbody && families.length > 0) {
+      tbody.innerHTML = families.map(f => `
+        <tr>
+          <td style="font-family:monospace;font-size:11px;">${f.id.slice(0,8)}...</td>
+          <td>${f.parentA?.name || '–'}</td>
+          <td>${f.parentB?.name || 'Not joined yet'}</td>
+          <td><span class="badge ${f.parentA?.plan === 'standard' ? 'badge-blue' : f.parentA?.plan === 'family' ? 'badge-green' : 'badge-gray'}">${f.parentA?.plan || 'trial'}</span></td>
+          <td>${new Date(f.createdAt).toLocaleDateString('en-GB')}</td>
+          <td><span class="badge badge-green">Active</span></td>
+          <td><button class="btn btn-sm" onclick="">View</button></td>
+        </tr>`).join('');
+    }
+
+    // Flagged messages
+    const flags = await adminFetch('/api/admin/flags');
+    const flagBody = document.getElementById('flagBody');
+    if (flagBody) {
+      if (flags.length === 0) {
+        flagBody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--muted);">No flagged messages</td></tr>';
+      } else {
+        flagBody.innerHTML = flags.map(f => `
+          <tr>
+            <td>${new Date(f.sentAt).toLocaleDateString('en-GB')}</td>
+            <td style="font-family:monospace;font-size:11px;">${f.familyId.slice(0,8)}...</td>
+            <td style="font-style:italic;">${f.preview}...</td>
+            <td><span class="badge ${f.severity === 'high' ? 'badge-red' : 'badge-yellow'}">${f.severity}</span></td>
+            <td>Blocked</td>
+          </tr>`).join('');
+      }
+    }
   } catch(e) {
-    console.warn('API fetch failed, using mock data', e);
+    console.warn('API fetch failed, using mock data:', e.message);
   }
 }
 
