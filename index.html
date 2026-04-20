@@ -986,8 +986,8 @@ function setBtnLoading(btnId, loading) {
 }
 
 function persistAuth(token, userData, familyData, childData) {
-  localStorage.setItem('cokinnect_token', token);
-  localStorage.setItem('cokinnect_user', JSON.stringify({ user: userData, family: familyData, child: childData }));
+  localStorage.setItem('kinnect_token', token);
+  localStorage.setItem('kinnect_user', JSON.stringify({ user: userData, family: familyData, child: childData }));
   // Update state from real user data
   const role = userData.role; // 'parent_a' or 'parent_b'
   state.currentParent = role === 'parent_a' ? 'A' : 'B';
@@ -1024,7 +1024,7 @@ async function authLogin() {
     } else {
       await sleep(800);
       // Demo mode: accept any credentials, treat email as identifier
-      const stored = localStorage.getItem('cokinnect_demo_users');
+      const stored = localStorage.getItem('kinnect_demo_users');
       const demoUsers = stored ? JSON.parse(stored) : {};
       if (!demoUsers[email]) throw new Error('Invalid email or password');
       const u = demoUsers[email];
@@ -1064,14 +1064,14 @@ async function authRegister() {
       result = await fetchAPI('/api/auth/register', 'POST', { email, password, fullName, childName, childDob });
     } else {
       await sleep(900);
-      const stored = localStorage.getItem('cokinnect_demo_users');
+      const stored = localStorage.getItem('kinnect_demo_users');
       const demoUsers = stored ? JSON.parse(stored) : {};
       if (demoUsers[email]) throw new Error('An account with this email already exists.');
       const userId = 'user_' + Date.now();
       const familyId = 'fam_' + Date.now();
       const inviteCode = 'DEMO' + Math.random().toString(36).substring(2,4).toUpperCase();
       demoUsers[email] = { id: userId, password, fullName, role: 'parent_a', familyId, inviteCode, childId: 'ch_'+Date.now(), childName };
-      localStorage.setItem('cokinnect_demo_users', JSON.stringify(demoUsers));
+      localStorage.setItem('kinnect_demo_users', JSON.stringify(demoUsers));
       result = {
         token: makeDemoToken(),
         user: { id: userId, email, fullName, role: 'parent_a' },
@@ -1108,7 +1108,7 @@ async function authJoin() {
       result = await fetchAPI('/api/auth/join', 'POST', { email, password, fullName, inviteCode });
     } else {
       await sleep(900);
-      const stored = localStorage.getItem('cokinnect_demo_users');
+      const stored = localStorage.getItem('kinnect_demo_users');
       const demoUsers = stored ? JSON.parse(stored) : {};
       // Find the Parent A with this invite code
       const parentA = Object.values(demoUsers).find(u => u.inviteCode === inviteCode && u.role === 'parent_a');
@@ -1116,7 +1116,7 @@ async function authJoin() {
       if (demoUsers[email]) throw new Error('An account with this email already exists.');
       const userId = 'user_' + Date.now();
       demoUsers[email] = { id: userId, password, fullName, role: 'parent_b', familyId: parentA.familyId, inviteCode: parentA.inviteCode, childId: parentA.childId, childName: parentA.childName };
-      localStorage.setItem('cokinnect_demo_users', JSON.stringify(demoUsers));
+      localStorage.setItem('kinnect_demo_users', JSON.stringify(demoUsers));
       result = {
         token: makeDemoToken(),
         user: { id: userId, email, fullName, role: 'parent_b' },
@@ -1948,8 +1948,8 @@ function shareInviteCode() {
 }
 
 function signOut() {
-  localStorage.removeItem('cokinnect_token');
-  localStorage.removeItem('cokinnect_user');
+  localStorage.removeItem('kinnect_token');
+  localStorage.removeItem('kinnect_user');
   state.currentParent = null;
   state.currentUser = null;
   state.currentFamily = null;
@@ -2138,8 +2138,8 @@ window.addEventListener('load', () => {
   }
 
   // ── Check localStorage for existing session ──
-  const token = localStorage.getItem('cokinnect_token');
-  const userRaw = localStorage.getItem('cokinnect_user');
+  const token = localStorage.getItem('kinnect_token');
+  const userRaw = localStorage.getItem('kinnect_user');
   if (token && userRaw) {
     try {
       const { user, family, child } = JSON.parse(userRaw);
@@ -2150,8 +2150,8 @@ window.addEventListener('load', () => {
       }
     } catch (e) {
       // corrupted storage, fall through to auth
-      localStorage.removeItem('cokinnect_token');
-      localStorage.removeItem('cokinnect_user');
+      localStorage.removeItem('kinnect_token');
+      localStorage.removeItem('kinnect_user');
     }
   }
   // No valid session — show auth screen
