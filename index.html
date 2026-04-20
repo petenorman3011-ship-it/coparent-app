@@ -1348,11 +1348,24 @@ function moderateMessage(text) {
 }
 
 function getSuggestion(text) {
-  // Simple neutral rewrite suggestions
-  if (text.toLowerCase().includes('you never') || text.toLowerCase().includes('you always')) {
-    return 'Try: "I\'ve noticed that sometimes..." — focusing on specific situations rather than absolutes helps keep communication calm.';
+  const lower = text.toLowerCase();
+  const child = state.childName || 'our child';
+  if (lower.includes('you never') || lower.includes('you always')) {
+    return `I noticed this has been an issue. Can we discuss what works best for ${child}?`;
   }
-  return 'Try rephrasing to focus on the child\'s needs and specific situations rather than general statements about the other parent.';
+  if (lower.includes('your fault') || lower.includes('you ruin')) {
+    return `I'm finding this situation difficult. Can we talk about how to improve things for ${child}?`;
+  }
+  if (lower.includes('hate') || lower.includes('kill') || lower.includes('hurt')) {
+    return `I'm feeling very frustrated right now. Can we arrange a time to talk about this calmly?`;
+  }
+  if (lower.includes('liar') || lower.includes('lying') || lower.includes('cheat')) {
+    return `I have some concerns I'd like to discuss. When can we talk about this?`;
+  }
+  if (lower.includes('stupid') || lower.includes('idiot') || lower.includes('useless')) {
+    return `I'm struggling with this situation. Can we find a better way to handle it together for ${child}?`;
+  }
+  return `Can we discuss ${child}'s arrangements calmly? I'd like to find a solution that works for everyone.`;
 }
 
 function renderMessages() {
@@ -1406,12 +1419,12 @@ function sendMessage() {
     const warningHtml = `<div class="moderation-warning" id="${warningId}">
       <div class="mod-title">&#x26A0;&#xFE0F; Message flagged</div>
       <div class="mod-text">This message may contain language that could escalate conflict. For ${state.childName}'s benefit, please consider rewording it calmly.</div>
-      <div class="mod-suggestion">&#x1F4A1; ${suggestion}</div>
-      <div class="mod-actions" style="flex-wrap:wrap;gap:6px;">
-        <button class="btn btn-secondary btn-sm" onclick="document.getElementById('${warningId}').remove();">Edit message</button>
-        <button class="btn btn-sm" style="background:#d1fae5;color:#065f46;" onclick="useRewrite('${warningId}')">&#x2728; Use suggested rewrite</button>
+      <div style="font-size:12px;font-weight:600;color:#166534;margin-bottom:6px;">Suggested rewrite:</div>
+      <div class="mod-suggestion" style="font-style:normal;font-weight:500;color:#0f172a;margin-bottom:16px;">&#x1F4A1; ${suggestion}</div>
+      <div class="mod-actions" style="flex-direction:column;gap:8px;">
+        <button class="btn btn-primary" style="background:#0d9488;color:#fff;padding:14px;font-size:14px;border-radius:12px;border:none;cursor:pointer;font-family:'Inter',sans-serif;font-weight:700;" onclick="useRewrite('${warningId}')">&#x2728; Use this rewrite</button>
+        <button class="btn btn-secondary" style="background:#f1f5f9;color:#64748b;padding:12px;font-size:13px;border-radius:12px;border:none;cursor:pointer;font-family:'Inter',sans-serif;" onclick="document.getElementById('${warningId}').remove();">Write my own message instead</button>
       </div>
-      <p style="font-size:11px;color:#991b1b;margin-top:10px;">Messages containing abusive or inappropriate language cannot be sent. Please rewrite your message respectfully.</p>
     </div>`;
     list.insertAdjacentHTML('beforeend', warningHtml);
     list.scrollTop = list.scrollHeight;

@@ -131,7 +131,7 @@
     <!-- STANDARD -->
     <div class="plan-card">
       <div class="plan-name">Standard</div>
-      <div class="plan-price"><sup>£</sup><span class="price-standard">9.99</span></div>
+      <div class="plan-price"><sup>£</sup><span class="price-standard">7.99</span></div>
       <div class="plan-period">per month, per family</div>
       <div class="plan-annual" id="annualStandard"></div>
       <div class="plan-desc">Everything you need to co-parent calmly and stay informed. Both parents get full access.</div>
@@ -154,7 +154,7 @@
     <div class="plan-card featured">
       <div class="popular-badge">⭐ Most Popular</div>
       <div class="plan-name">Family</div>
-      <div class="plan-price"><sup>£</sup><span class="price-family">14.99</span></div>
+      <div class="plan-price"><sup>£</sup><span class="price-family">12.99</span></div>
       <div class="plan-period">per month, per family</div>
       <div class="plan-annual" id="annualFamily"></div>
       <div class="plan-desc">Everything in Standard, plus legal-grade exports and priority support for higher-conflict situations.</div>
@@ -191,7 +191,7 @@
     <thead>
       <tr>
         <th>Feature</th>
-        <th>Standard<br/>£9.99/mo</th>
+        <th>Standard<br/>£7.99/mo per parent</th>
         <th>Family<br/>£14.99/mo</th>
       </tr>
     </thead>
@@ -261,10 +261,10 @@ function toggleBilling() {
   isAnnual = !isAnnual;
   const btn = document.getElementById('billingToggle');
   btn.classList.toggle('annual', isAnnual);
-  document.querySelector('.price-standard').textContent = isAnnual ? '7.99' : '9.99';
-  document.querySelector('.price-family').textContent = isAnnual ? '11.99' : '14.99';
-  document.getElementById('annualStandard').textContent = isAnnual ? 'Billed as £95.88/year (save £24)' : '';
-  document.getElementById('annualFamily').textContent = isAnnual ? 'Billed as £143.88/year (save £36)' : '';
+  document.querySelector('.price-standard').textContent = isAnnual ? '6.66' : '7.99';
+  document.querySelector('.price-family').textContent = isAnnual ? '10.82' : '12.99';
+  document.getElementById('annualStandard').textContent = isAnnual ? 'Billed as £79.99/year per parent (save £16)' : '';
+  document.getElementById('annualFamily').textContent = isAnnual ? 'Billed as £129.99/year per parent (save £26)' : '';
 }
 
 function toggleFaq(i) {
