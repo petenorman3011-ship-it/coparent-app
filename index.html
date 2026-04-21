@@ -923,7 +923,7 @@
 
 <script>
 // ══ BACKEND CONFIG ══
-const CONFIG = { apiBase: 'https://api-production-b188.up.railway.app', useBackend: true };
+const CONFIG = { apiBase: 'https://api-production-b188.up.railway.app', useBackend: false };
 
 async function fetchAPI(endpoint, opts = {}, tokenOverride = null) {
   if (!CONFIG.useBackend) return null;
