@@ -2365,6 +2365,10 @@ function showScreen(name) {
   document.getElementById(`screen-${name}`).classList.add('active');
   document.getElementById(`nav-${name}`).classList.add('active');
 
+  // Hide chat input bar — only shown on support screen
+  const chatBar = document.getElementById('chatInputBar');
+  if (chatBar) chatBar.classList.remove('visible');
+
   const compose = document.getElementById('composeBar');
   if (compose) compose.style.display = name === 'messages' ? 'flex' : 'none';
 
@@ -2387,11 +2391,11 @@ function showScreen(name) {
   if (name === 'courtbundle') {
     initCourtBundle();
   }
+  // Always hide chat input bar first, only show on support screen
+  document.getElementById('chatInputBar').classList.remove('visible');
   if (name === 'support') {
     document.getElementById('chatInputBar').classList.add('visible');
     renderSupport();
-  } else {
-    document.getElementById('chatInputBar').classList.remove('visible');
   }
 }
 
