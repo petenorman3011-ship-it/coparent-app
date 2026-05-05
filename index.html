@@ -351,6 +351,43 @@
     .bundle-meta { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
     .date-range-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
+    /* ── SUPPORT CHAT ── */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes bounce {
+      0%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-6px); }
+    }
+    .support-chat-screen { padding: 0 !important; display: flex; flex-direction: column; height: calc(100vh - 70px); }
+    .support-header { padding: 20px 20px 14px; background: var(--card); border-bottom: 1px solid var(--border); flex-shrink: 0; }
+    .support-header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+    .support-header h2 { font-size: 20px; font-weight: 800; color: var(--text); }
+    .support-header p { font-size: 13px; color: var(--text-muted); }
+    .support-disclaimer { background: #fff7ed; border: 1.5px solid #fed7aa; border-radius: 10px; padding: 10px 14px; font-size: 12px; color: #92400e; line-height: 1.5; margin-top: 10px; }
+    .chat-messages { flex: 1; overflow-y: auto; padding: 16px 16px 120px; display: flex; flex-direction: column; gap: 12px; }
+    .chat-row { display: flex; align-items: flex-end; gap: 8px; animation: fadeInUp 0.25s ease both; }
+    .chat-row.user-row { flex-direction: row-reverse; }
+    .kira-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--teal); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 14px; font-weight: 800; flex-shrink: 0; }
+    .chat-bubble { max-width: 78%; padding: 11px 15px; border-radius: 18px; font-size: 14px; line-height: 1.55; }
+    .chat-bubble.kira { background: var(--teal-light); color: var(--teal-dark); border-bottom-left-radius: 4px; }
+    .chat-bubble.user { background: var(--teal); color: #fff; border-bottom-right-radius: 4px; }
+    .chat-bubble.kira a { color: var(--teal-dark); font-weight: 700; }
+    .typing-indicator { display: none; align-items: flex-end; gap: 8px; animation: fadeInUp 0.2s ease both; }
+    .typing-dots { background: var(--teal-light); border-radius: 18px; border-bottom-left-radius: 4px; padding: 12px 16px; display: flex; gap: 5px; align-items: center; }
+    .typing-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--teal); animation: bounce 1.2s infinite; }
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+    .chat-input-bar { position: fixed; bottom: 70px; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; background: #fff; border-top: 1px solid var(--border); padding: 10px 14px; display: none; gap: 10px; align-items: flex-end; z-index: 40; }
+    .chat-input-bar.visible { display: flex; }
+    .chat-input { flex: 1; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 22px; font-size: 15px; font-family: 'Inter', sans-serif; outline: none; resize: none; max-height: 100px; line-height: 1.5; }
+    .chat-input:focus { border-color: var(--teal); }
+    .chat-send-btn { width: 42px; height: 42px; border-radius: 50%; border: none; background: var(--teal); color: #fff; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; }
+    .chat-send-btn:hover { background: var(--teal-dark); }
+    .clear-chat-btn { font-size: 12px; color: var(--text-muted); background: none; border: none; cursor: pointer; padding: 0; font-family: 'Inter', sans-serif; }
+    .clear-chat-btn:hover { color: var(--rose); }
+
     /* ── PRINT STYLES ── */
     @media print {
       body > *:not(#printBundlePortal) { display: none !important; }
@@ -815,6 +852,37 @@
       </div>
     </div>
 
+    <!-- ── SUPPORT CHAT ── -->
+    <div class="screen support-chat-screen" id="screen-support">
+      <div class="support-header">
+        <div class="support-header-top">
+          <div>
+            <h2>🤝 CoKinnect Support</h2>
+            <p>Chat with Kira, your co-parenting guide</p>
+          </div>
+          <button class="clear-chat-btn" onclick="clearSupportChat()">Clear chat</button>
+        </div>
+        <div class="support-disclaimer">⚠️ Kira is an AI support guide, not a legal or mental health professional. In a crisis, call Samaritans on <strong>116 123</strong> (free, 24/7).</div>
+      </div>
+      <div class="chat-messages" id="chatMessages">
+        <div class="typing-indicator" id="typingIndicator">
+          <div class="kira-avatar">K</div>
+          <div class="typing-dots">
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="chat-input-bar" id="chatInputBar">
+    <textarea class="chat-input" id="chatInput" placeholder="Talk to Kira…" rows="1"
+      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendSupportMessage();}"
+      oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
+    <button class="chat-send-btn" onclick="sendSupportMessage()">➤</button>
   </div>
 
   <!-- Bottom Nav -->
@@ -853,6 +921,10 @@
     <button class="nav-item" id="nav-courtbundle" onclick="showScreen('courtbundle')">
       <span class="nav-icon">⚖️</span>
       <span class="nav-label">Bundle</span>
+    </button>
+    <button class="nav-item" id="nav-support" onclick="showScreen('support')">
+      <span class="nav-icon">🤝</span>
+      <span class="nav-label">Support</span>
     </button>
     <button class="nav-item" id="nav-notifications" onclick="showScreen('notifications')">
       <span class="nav-badge">
@@ -2315,6 +2387,12 @@ function showScreen(name) {
   if (name === 'courtbundle') {
     initCourtBundle();
   }
+  if (name === 'support') {
+    document.getElementById('chatInputBar').classList.add('visible');
+    renderSupport();
+  } else {
+    document.getElementById('chatInputBar').classList.remove('visible');
+  }
 }
 
 // ══ MODAL ══
@@ -2970,6 +3048,161 @@ window.addEventListener('appinstalled', () => {
   const banner = document.getElementById('installBanner');
   if (banner) banner.style.display = 'none';
 });
+
+// ══ KIRA SUPPORT CHAT ══
+
+const KIRA_RESPONSES = {
+  crisis: [
+    "I'm really glad you reached out. Please contact the Samaritans right now — call or text <strong>116 123</strong> (free, 24/7). You don't have to go through this alone. 💙",
+    "Your safety is the most important thing right now. Please call <strong>116 123</strong> (Samaritans, free & always open). I'm here too, but they can give you real support right now."
+  ],
+  angry: [
+    "It sounds like you're carrying a lot of frustration right now — that's completely understandable. Co-parenting is hard, especially when things feel unfair. Take a breath. What's going on?",
+    "I hear you — that sounds really infuriating. It's okay to feel angry. What would help most right now: venting, practical advice, or help drafting a message?",
+    "Being this frustrated is exhausting. You're allowed to feel this way. Once you've had a moment, it can help to write down exactly what happened — would you like to talk it through?"
+  ],
+  worried: [
+    "Court and legal processes can feel really overwhelming. You're not alone in feeling this way. CoKinnect's Court Bundle feature can help you export a clean, dated record of logs and messages — that's often exactly what solicitors need. Want to know more?",
+    "It's understandable to feel scared about legal proceedings. One thing that really helps is having clear, documented evidence — your logs, messages, and handover records here are a great start. The ⚖️ Court Bundle feature can pull it all together for you.",
+    "Legal worries are so stressful. Try to take it one step at a time. Your records in CoKinnect are timestamped and organised — use the Court Bundle section to export them if you need to share with a solicitor."
+  ],
+  handover: [
+    "Handovers can be tricky. A few things that help: keep it brief and child-focused, have a set location and time, and avoid discussing disagreements in front of the children. You can also log each handover in the Handovers section as a timestamped record. 🤝",
+    "For smooth pickups and drop-offs, consistency is key — same time, same place when possible. If things are tense, a neutral public spot like a supermarket car park can reduce conflict. Log every handover in the app so you have a clear record.",
+    "Handover stress is really common. It helps to keep the exchange brief, child-centred, and low-key. If you're worried about disputes, the Handover Log feature keeps a timestamped record of every exchange."
+  ],
+  overwhelmed: [
+    "You're doing something incredibly hard, and the fact you're still showing up for your child every day says everything. It's okay to not be okay right now. Is there one small thing you could do today just for yourself?",
+    "Co-parenting exhaustion is real — it's like running a marathon with no finish line in sight. Please be kind to yourself. Even five minutes of quiet can help reset things. What's been the hardest part lately?",
+    "When everything feels like too much, try to just focus on the next hour — not the whole week. You don't have to have it all figured out. Would it help to talk through what's feeling most overwhelming?"
+  ],
+  alienation: [
+    "What you're describing sounds really serious and painful. Parental alienation is incredibly damaging for children. The most important thing right now is to document everything — dates, what was said, how the child reacted. Your logs and messages here are timestamped evidence. Please also speak to a family law solicitor as soon as you can.",
+    "I'm really sorry you're experiencing this. It's deeply distressing. Keep logging everything in detail — the Court Bundle feature can export it all. A family mediator or solicitor can advise on next steps. You're right to take this seriously.",
+    "This is serious, and you're right to be concerned. Document everything with as much detail as possible — use the Daily Log for observations and the Messages section for communication records. A family law solicitor should be your next step."
+  ],
+  sad: [
+    "I'm sorry you're feeling this way. It's okay to be sad — grief and loss are part of this process too, even when the relationship that's ended isn't the one with your child. I'm here. What's on your mind?",
+    "That sounds really hard. You don't have to put a brave face on here. What's been making things feel so heavy lately?",
+    "Sending you a virtual hug. 💙 Co-parenting grief is real — you're grieving a family as you imagined it. That's allowed. Want to talk about what's brought this on?"
+  ],
+  positive: [
+    "That's wonderful! 🎉 It's so important to celebrate the good moments — hold onto this one. What happened?",
+    "I love hearing this! Those wins, big or small, are what keep you going. Well done — to you and to your child. 🌟",
+    "Yes! 🙌 This is the stuff that matters. It sounds like things are moving in the right direction. Tell me more!"
+  ],
+  replyHelp: [
+    "Happy to help you think through a response. Go ahead and paste or type what they said, and I'll help you craft something calm and constructive.",
+    "Of course — share the message with me and I'll suggest a response that's firm but non-escalating.",
+    "Sure! Paste the message here and we'll work on a reply together. The goal is always to keep it child-focused and calm."
+  ],
+  default: [
+    "Thanks for sharing that with me. I'm here to listen. Can you tell me a bit more about what's going on?",
+    "I hear you. Co-parenting is genuinely one of the hardest things to navigate. What's been weighing on you most?",
+    "I'm glad you reached out. Whatever you're going through, you don't have to figure it all out alone. What would be most helpful right now — a listening ear, practical tips, or help with communication?"
+  ]
+};
+
+function getKiraResponse(msg) {
+  const m = msg.toLowerCase();
+  let category = 'default';
+  if (/hurt myself|suicide|end it|kill myself|don't want to be here|self harm/.test(m)) {
+    category = 'crisis';
+  } else if (/angry|frustrated|hate|furious|rage|livid|fuming/.test(m)) {
+    category = 'angry';
+  } else if (/worried|scared|fear|court|solicitor|judge|legal|barrister|hearing|cafcass|social worker/.test(m)) {
+    category = 'worried';
+  } else if (/handover|pickup|pick up|drop off|collect|collection|dropoff/.test(m)) {
+    category = 'handover';
+  } else if (/overwhelmed|exhausted|can't cope|cannot cope|struggling|burnt out|burnout|too much/.test(m)) {
+    category = 'overwhelmed';
+  } else if (/alienat|turning against|poisoning|bad mouth/.test(m)) {
+    category = 'alienation';
+  } else if (/sad|crying|cried|depressed|upset|low|heartbroken/.test(m)) {
+    category = 'sad';
+  } else if (/good news|going well|positive|great|happy|excited|proud|wonderful|amazing/.test(m)) {
+    category = 'positive';
+  } else if (/help me reply|how do i respond|what should i say|how should i respond|help me respond/.test(m)) {
+    category = 'replyHelp';
+  }
+  const pool = KIRA_RESPONSES[category];
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+function renderSupport() {
+  const history = JSON.parse(localStorage.getItem('kinnect_support_chat') || '[]');
+  const container = document.getElementById('chatMessages');
+  const typing = document.getElementById('typingIndicator');
+
+  // Clear existing bubbles (keep typing indicator)
+  Array.from(container.children).forEach(el => {
+    if (el !== typing) el.remove();
+  });
+
+  if (history.length === 0) {
+    const firstName = (state.currentUser?.fullName || '').split(' ')[0] || 'there';
+    const welcome = [
+      { role: 'kira', text: `Hi ${firstName}! 👋 I'm Kira, your CoKinnect support guide. I'm here to help you navigate the tough moments of co-parenting — whether that's frustration, legal worries, tricky handovers, or just needing someone to talk to.` },
+      { role: 'kira', text: `I'm not a lawyer or therapist, but I'm here to listen and point you in the right direction. What's on your mind today?` }
+    ];
+    localStorage.setItem('kinnect_support_chat', JSON.stringify(welcome));
+    welcome.forEach(m => container.insertBefore(createChatBubble(m.role, m.text), typing));
+  } else {
+    history.forEach(m => container.insertBefore(createChatBubble(m.role, m.text), typing));
+  }
+
+  container.scrollTop = container.scrollHeight;
+}
+
+function createChatBubble(role, text) {
+  const row = document.createElement('div');
+  row.className = 'chat-row' + (role === 'user' ? ' user-row' : '');
+  if (role === 'kira') {
+    row.innerHTML = `<div class="kira-avatar">K</div><div class="chat-bubble kira">${text}</div>`;
+  } else {
+    row.innerHTML = `<div class="chat-bubble user">${escHtml(text)}</div>`;
+  }
+  return row;
+}
+
+function sendSupportMessage() {
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if (!text) return;
+
+  const history = JSON.parse(localStorage.getItem('kinnect_support_chat') || '[]');
+  const userMsg = { role: 'user', text };
+  history.push(userMsg);
+  localStorage.setItem('kinnect_support_chat', JSON.stringify(history));
+
+  const container = document.getElementById('chatMessages');
+  const typing = document.getElementById('typingIndicator');
+  container.insertBefore(createChatBubble('user', text), typing);
+  input.value = '';
+  input.style.height = 'auto';
+  container.scrollTop = container.scrollHeight;
+
+  typing.style.display = 'flex';
+  container.scrollTop = container.scrollHeight;
+
+  setTimeout(() => {
+    typing.style.display = 'none';
+    const response = getKiraResponse(text);
+    const kiraMsg = { role: 'kira', text: response };
+    const updated = JSON.parse(localStorage.getItem('kinnect_support_chat') || '[]');
+    updated.push(kiraMsg);
+    localStorage.setItem('kinnect_support_chat', JSON.stringify(updated));
+    container.insertBefore(createChatBubble('kira', response), typing);
+    container.scrollTop = container.scrollHeight;
+  }, 1200 + Math.random() * 600);
+}
+
+function clearSupportChat() {
+  if (!confirm('Clear your conversation with Kira? This cannot be undone.')) return;
+  localStorage.removeItem('kinnect_support_chat');
+  renderSupport();
+  showToast('Chat cleared');
+}
 </script>
 
 <!-- PWA Install Banner -->
