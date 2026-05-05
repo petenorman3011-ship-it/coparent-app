@@ -325,6 +325,39 @@
     /* ── MILESTONE FILTER ── */
     .milestone-toggle { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border: 2px solid var(--border); border-radius: 100px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; background: #fff; color: var(--text-muted); margin-bottom: 12px; }
     .milestone-toggle.active { border-color: #f59e0b; background: #fef9c3; color: #854d0e; }
+
+    /* ── BOTTOM NAV — SCROLLABLE ── */
+    .bottom-nav { overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; justify-content: flex-start; }
+    .bottom-nav::-webkit-scrollbar { display: none; }
+    .nav-item { min-width: 58px; flex: 0 0 auto; }
+
+    /* ── HANDOVER LOG ── */
+    .handover-card { background: var(--card); border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow); margin-bottom: 12px; border: 1px solid var(--border); border-left: 4px solid var(--teal); }
+    .handover-meta { font-size: 12px; color: var(--text-muted); margin-bottom: 4px; }
+    .handover-type { font-size: 15px; font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+    .handover-location { font-size: 13px; color: var(--text-muted); margin-bottom: 4px; display: flex; align-items: flex-start; gap: 4px; }
+    .handover-notes { font-size: 13px; color: var(--text); margin-top: 6px; line-height: 1.5; }
+    .parent-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex-shrink: 0; margin-top: 3px; }
+
+    /* ── COURT BUNDLE ── */
+    .bundle-section { background: var(--card); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); margin-bottom: 16px; border: 1px solid var(--border); }
+    .bundle-check-item { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); cursor: pointer; }
+    .bundle-check-item:last-child { border-bottom: none; }
+    .bundle-check-item input[type=checkbox] { width: 20px; height: 20px; accent-color: var(--teal); flex-shrink: 0; cursor: pointer; }
+    .bundle-check-label { font-size: 15px; font-weight: 500; }
+    .bundle-history-item { display: flex; align-items: flex-start; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border); }
+    .bundle-history-item:last-child { border-bottom: none; }
+    .bundle-date { font-size: 14px; font-weight: 600; }
+    .bundle-meta { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .date-range-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    /* ── PRINT STYLES ── */
+    @media print {
+      body > *:not(#printBundlePortal) { display: none !important; }
+      #printBundlePortal { display: block !important; }
+      .print-page-break { page-break-before: always; }
+      .no-print { display: none !important; }
+    }
   </style>
 </head>
 <body>
@@ -692,6 +725,70 @@
       <div id="notifList"></div>
     </div>
 
+    <!-- ── HANDOVERS ── -->
+    <div class="screen" id="screen-handovers">
+      <div class="section-header">
+        <div class="section-title-lg">🤝 Handover Log</div>
+        <button class="btn btn-primary btn-sm" onclick="openHandoverModal()">+ Log Handover</button>
+      </div>
+      <div id="handoverFeed"></div>
+    </div>
+
+    <!-- ── COURT BUNDLE ── -->
+    <div class="screen" id="screen-courtbundle">
+      <div class="section-title-lg" style="margin-bottom:4px;">⚖️ Court Bundle Export</div>
+      <p style="font-size:14px;color:var(--text-muted);margin-bottom:20px;">Generate a legally-formatted PDF of your co-parenting records</p>
+
+      <div class="bundle-section">
+        <div class="card-title">📅 Date Range</div>
+        <div class="date-range-row">
+          <div class="form-group" style="margin:0;">
+            <label>From</label>
+            <input type="date" id="bundleFrom"/>
+          </div>
+          <div class="form-group" style="margin:0;">
+            <label>To</label>
+            <input type="date" id="bundleTo"/>
+          </div>
+        </div>
+      </div>
+
+      <div class="bundle-section">
+        <div class="card-title">📋 Include in Bundle</div>
+        <div class="bundle-check-item" onclick="toggleBundleCheck('bundleMessages')">
+          <input type="checkbox" id="bundleMessages" checked onclick="event.stopPropagation()"/>
+          <span class="bundle-check-label">💬 Message log</span>
+        </div>
+        <div class="bundle-check-item" onclick="toggleBundleCheck('bundleHandovers')">
+          <input type="checkbox" id="bundleHandovers" checked onclick="event.stopPropagation()"/>
+          <span class="bundle-check-label">🤝 Handover log</span>
+        </div>
+        <div class="bundle-check-item" onclick="toggleBundleCheck('bundleExpenses')">
+          <input type="checkbox" id="bundleExpenses" checked onclick="event.stopPropagation()"/>
+          <span class="bundle-check-label">💰 Expense records</span>
+        </div>
+        <div class="bundle-check-item" onclick="toggleBundleCheck('bundleIncidents')">
+          <input type="checkbox" id="bundleIncidents" checked onclick="event.stopPropagation()"/>
+          <span class="bundle-check-label">⚠️ Incident reports</span>
+        </div>
+        <div class="bundle-check-item" onclick="toggleBundleCheck('bundleCalendar')">
+          <input type="checkbox" id="bundleCalendar" checked onclick="event.stopPropagation()"/>
+          <span class="bundle-check-label">📅 Calendar events &amp; schedule changes</span>
+        </div>
+        <div class="bundle-check-item" onclick="toggleBundleCheck('bundleLog')">
+          <input type="checkbox" id="bundleLog" checked onclick="event.stopPropagation()"/>
+          <span class="bundle-check-label">📝 Daily log entries</span>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" onclick="generateBundle()" style="margin-bottom:24px;">⚖️ Generate Bundle</button>
+
+      <div class="bundle-section">
+        <div class="card-title">📁 Bundle History</div>
+        <div id="bundleHistoryList"><div style="font-size:13px;color:var(--text-muted);padding:12px 0;">No bundles generated yet.</div></div>
+      </div>
+    </div>
+
     <!-- ── MEDS ── -->
     <div class="screen" id="screen-meds">
       <div class="section-header">
@@ -748,6 +845,14 @@
     <button class="nav-item" id="nav-settings" onclick="showScreen('settings')">
       <span class="nav-icon">⚙️</span>
       <span class="nav-label">Settings</span>
+    </button>
+    <button class="nav-item" id="nav-handovers" onclick="showScreen('handovers')">
+      <span class="nav-icon">🤝</span>
+      <span class="nav-label">Handovers</span>
+    </button>
+    <button class="nav-item" id="nav-courtbundle" onclick="showScreen('courtbundle')">
+      <span class="nav-icon">⚖️</span>
+      <span class="nav-label">Bundle</span>
     </button>
     <button class="nav-item" id="nav-notifications" onclick="showScreen('notifications')">
       <span class="nav-badge">
@@ -861,6 +966,49 @@
     </div>
     <button class="btn btn-primary" onclick="submitRequest()" style="margin-bottom:8px;">Submit Request</button>
     <button class="btn btn-secondary" onclick="closeModal('requestModal')">Cancel</button>
+  </div>
+</div>
+
+<!-- Handover Log Modal -->
+<div class="modal-overlay" id="handoverModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🤝 Log Handover</div>
+    <div class="form-group">
+      <label>Who collected the child?</label>
+      <select id="handoverCollector" onchange="checkHandoverOther()">
+        <option value="A">Parent A</option>
+        <option value="B">Parent B</option>
+        <option value="other">Other person</option>
+      </select>
+    </div>
+    <div class="form-group" id="handoverOtherGroup" style="display:none;">
+      <label>Their name</label>
+      <input type="text" id="handoverOtherName" placeholder="e.g. Grandparent, relative..."/>
+    </div>
+    <div class="form-group">
+      <label>Date &amp; time</label>
+      <input type="datetime-local" id="handoverDateTime"/>
+    </div>
+    <div class="form-group">
+      <label>Location</label>
+      <button class="btn btn-secondary btn-sm" id="gpsBtn" onclick="useCurrentLocation()" style="margin-bottom:8px;width:100%;">&#128205; Use Current Location</button>
+      <input type="text" id="handoverLocation" placeholder="Or enter address manually..."/>
+    </div>
+    <div class="form-group">
+      <label>Photo (optional)</label>
+      <label class="photo-upload-btn" for="handoverPhotoInput">
+        <span style="font-size:20px;">📸</span> Add photo
+      </label>
+      <input type="file" id="handoverPhotoInput" accept="image/*" style="display:none;" onchange="handleHandoverPhoto(event)"/>
+      <div id="handoverPhotoPreview" style="margin-top:8px;"></div>
+    </div>
+    <div class="form-group">
+      <label>Notes (optional)</label>
+      <textarea id="handoverNotes" rows="3" placeholder="Any notes about this handover..." style="width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:12px;font-size:15px;font-family:'Inter',sans-serif;outline:none;resize:none;"></textarea>
+    </div>
+    <button class="btn btn-primary" onclick="saveHandover()" style="margin-bottom:8px;">Log Handover</button>
+    <button class="btn btn-secondary" onclick="closeModal('handoverModal')">Cancel</button>
   </div>
 </div>
 
@@ -1250,6 +1398,7 @@ function initApp() {
   renderRequests();
   renderNotifications();
   renderMeds();
+  renderHandovers();
   updateLegend();
 }
 
@@ -2160,6 +2309,12 @@ function showScreen(name) {
   if (name === 'calendar') {
     checkHandoverBanner();
   }
+  if (name === 'handovers') {
+    renderHandovers();
+  }
+  if (name === 'courtbundle') {
+    initCourtBundle();
+  }
 }
 
 // ══ MODAL ══
@@ -2281,6 +2436,407 @@ function renderMeds() {
       </div>`;
     }).join('');
   }
+}
+
+// ══ HANDOVERS ══
+let pendingHandoverPhoto = null;
+
+function openHandoverModal() {
+  const now = new Date();
+  // Build local ISO string without offset drift
+  const pad = n => String(n).padStart(2, '0');
+  const localISO = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+  document.getElementById('handoverDateTime').value = localISO;
+  document.getElementById('handoverLocation').value = '';
+  document.getElementById('handoverNotes').value = '';
+  document.getElementById('handoverPhotoPreview').innerHTML = '';
+  document.getElementById('handoverOtherGroup').style.display = 'none';
+  document.getElementById('handoverOtherName').value = '';
+  pendingHandoverPhoto = null;
+
+  // Update select options with real parent names
+  const sel = document.getElementById('handoverCollector');
+  sel.value = 'A';
+  sel.options[0].text = `${state.parentAName} (Parent A)`;
+  sel.options[1].text = `${state.parentBName} (Parent B)`;
+
+  const gpsBtn = document.getElementById('gpsBtn');
+  if (gpsBtn) { gpsBtn.textContent = '\u{1F4CD} Use Current Location'; gpsBtn.disabled = false; gpsBtn.style.color = ''; }
+
+  document.getElementById('handoverModal').classList.add('open');
+}
+
+function checkHandoverOther() {
+  const val = document.getElementById('handoverCollector').value;
+  document.getElementById('handoverOtherGroup').style.display = val === 'other' ? 'block' : 'none';
+}
+
+function useCurrentLocation() {
+  const btn = document.getElementById('gpsBtn');
+  const locInput = document.getElementById('handoverLocation');
+
+  if (!navigator.geolocation) {
+    showToast('Geolocation not supported by your browser');
+    return;
+  }
+
+  btn.textContent = '\u23F3 Getting location...';
+  btn.disabled = true;
+
+  navigator.geolocation.getCurrentPosition(
+    async (pos) => {
+      const { latitude, longitude } = pos.coords;
+      locInput.value = `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+      btn.textContent = '\u{1F4CD} Locating address...';
+
+      // Reverse geocode using Nominatim
+      try {
+        const resp = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`,
+          { headers: { 'Accept-Language': 'en', 'User-Agent': 'CoKinnect/1.0' } }
+        );
+        const data = await resp.json();
+        if (data && data.display_name) {
+          locInput.value = data.display_name;
+        }
+      } catch (e) {
+        // GPS coordinates already set above as fallback
+      }
+
+      btn.textContent = '\u{1F4CD} Location captured \u2713';
+      btn.style.color = 'var(--teal)';
+      btn.disabled = false;
+    },
+    (err) => {
+      btn.textContent = '\u{1F4CD} Use Current Location';
+      btn.disabled = false;
+      const msgs = { 1: 'Location access denied', 2: 'Location unavailable', 3: 'Location request timed out' };
+      showToast(msgs[err.code] || 'Could not get location');
+    },
+    { enableHighAccuracy: true, timeout: 10000 }
+  );
+}
+
+function handleHandoverPhoto(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    pendingHandoverPhoto = e.target.result;
+    const preview = document.getElementById('handoverPhotoPreview');
+    preview.innerHTML = `<img src="${pendingHandoverPhoto}" class="photo-thumb" style="width:80px;height:80px;cursor:pointer;" onclick="openLightbox(pendingHandoverPhoto)"/>`;
+  };
+  reader.readAsDataURL(file);
+  event.target.value = '';
+}
+
+function saveHandover() {
+  const collector = document.getElementById('handoverCollector').value;
+  const otherName = document.getElementById('handoverOtherName').value.trim();
+  const dateTime = document.getElementById('handoverDateTime').value;
+  const location = document.getElementById('handoverLocation').value.trim();
+  const notes = document.getElementById('handoverNotes').value.trim();
+
+  if (!dateTime) { showToast('Please enter date & time'); return; }
+
+  let collectorLabel, collectorParent;
+  if (collector === 'A') {
+    collectorLabel = state.parentAName;
+    collectorParent = 'A';
+  } else if (collector === 'B') {
+    collectorLabel = state.parentBName;
+    collectorParent = 'B';
+  } else {
+    collectorLabel = otherName || 'Other';
+    collectorParent = null;
+  }
+
+  const handover = {
+    id: Date.now(),
+    collector,
+    collectorLabel,
+    collectorParent,
+    dateTime,
+    location: location || null,
+    notes: notes || null,
+    photo: pendingHandoverPhoto || null,
+    loggedBy: state.currentParent,
+    loggedAt: new Date().toISOString(),
+  };
+
+  const existing = JSON.parse(localStorage.getItem('kinnect_handovers') || '[]');
+  existing.unshift(handover);
+  localStorage.setItem('kinnect_handovers', JSON.stringify(existing));
+
+  pendingHandoverPhoto = null;
+  closeModal('handoverModal');
+  renderHandovers();
+  addNotification('\ud83e\udd1d', '#ccfbf1', 'Handover logged', `${collectorLabel} collected ${state.childName}`);
+  showToast('Handover logged \u2713');
+}
+
+function renderHandovers() {
+  const feed = document.getElementById('handoverFeed');
+  if (!feed) return;
+
+  const handovers = JSON.parse(localStorage.getItem('kinnect_handovers') || '[]');
+
+  if (handovers.length === 0) {
+    feed.innerHTML = `<div class="empty-state"><div class="empty-icon">\ud83e\udd1d</div><p>No handovers logged yet.<br/><span style="font-size:13px;">Tap + Log Handover to add the first one!</span></p></div>`;
+    return;
+  }
+
+  feed.innerHTML = handovers.map(h => {
+    const dt = new Date(h.dateTime);
+    const dateLabel = dt.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+    const timeLabel = dt.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+    const parentColor = h.collectorParent === 'A' ? 'var(--parent-a)' : h.collectorParent === 'B' ? 'var(--parent-b)' : '#64748b';
+    const photoHtml = h.photo
+      ? `<img src="${h.photo}" class="photo-thumb" style="width:64px;height:64px;margin-top:8px;" onclick="openHandoverPhoto(${h.id})"/>`
+      : '';
+    return `<div class="handover-card" style="border-left-color:${parentColor};">
+      <div class="handover-meta">${dateLabel} at ${timeLabel}</div>
+      <div class="handover-type">
+        <span class="parent-dot" style="background:${parentColor};"></span>
+        Collected by ${h.collectorLabel}
+      </div>
+      ${h.location ? `<div class="handover-location">\ud83d\udccd ${h.location}</div>` : ''}
+      ${h.notes ? `<div class="handover-notes">${h.notes}</div>` : ''}
+      ${photoHtml}
+    </div>`;
+  }).join('');
+}
+
+function openHandoverPhoto(handoverId) {
+  const handovers = JSON.parse(localStorage.getItem('kinnect_handovers') || '[]');
+  const h = handovers.find(x => x.id == handoverId);
+  if (h && h.photo) openLightbox(h.photo);
+}
+
+// ══ COURT BUNDLE ══
+function toggleBundleCheck(id) {
+  const cb = document.getElementById(id);
+  if (cb) cb.checked = !cb.checked;
+}
+
+function initCourtBundle() {
+  const now = new Date();
+  const pad = n => String(n).padStart(2, '0');
+  const firstOfMonth = `${now.getFullYear()}-${pad(now.getMonth()+1)}-01`;
+  const today = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`;
+  const fromEl = document.getElementById('bundleFrom');
+  const toEl = document.getElementById('bundleTo');
+  if (fromEl && !fromEl.value) fromEl.value = firstOfMonth;
+  if (toEl && !toEl.value) toEl.value = today;
+  renderBundleHistory();
+}
+
+function renderBundleHistory() {
+  const list = document.getElementById('bundleHistoryList');
+  if (!list) return;
+  const history = JSON.parse(localStorage.getItem('kinnect_bundle_history') || '[]');
+  if (history.length === 0) {
+    list.innerHTML = '<div style="font-size:13px;color:var(--text-muted);padding:12px 0;">No bundles generated yet.</div>';
+    return;
+  }
+  list.innerHTML = history.map(b => `
+    <div class="bundle-history-item">
+      <div>
+        <div class="bundle-date">\ud83d\udcc4 Bundle \u2014 ${b.dateRange}</div>
+        <div class="bundle-meta">Generated ${b.generatedAt} &middot; Sections: ${b.sections.join(', ')}</div>
+      </div>
+    </div>`).join('');
+}
+
+function escHtml(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function bundleSectionHtml(title, headers, rowsHtml) {
+  const headerHtml = headers.map(h => `<th>${h}</th>`).join('');
+  return `<div class="bundle-section-block">
+    <h2 style="font-size:15px;font-weight:700;padding:12px 0 8px;border-bottom:2px solid #1e293b;margin-bottom:0;">${title}</h2>
+    <table style="width:100%;border-collapse:collapse;font-size:12px;">
+      <thead><tr style="background:#1e293b;">${headerHtml}</tr></thead>
+      <tbody>${rowsHtml}</tbody>
+    </table>
+  </div>`;
+}
+
+function generateBundle() {
+  const from = document.getElementById('bundleFrom').value;
+  const to = document.getElementById('bundleTo').value;
+
+  if (!from || !to) { showToast('Please select a date range'); return; }
+  if (from > to) { showToast('From date must be before To date'); return; }
+
+  const inclMessages = document.getElementById('bundleMessages').checked;
+  const inclHandovers = document.getElementById('bundleHandovers').checked;
+  const inclExpenses = document.getElementById('bundleExpenses').checked;
+  const inclIncidents = document.getElementById('bundleIncidents').checked;
+  const inclCalendar = document.getElementById('bundleCalendar').checked;
+  const inclLog = document.getElementById('bundleLog').checked;
+
+  if (!inclMessages && !inclHandovers && !inclExpenses && !inclIncidents && !inclCalendar && !inclLog) {
+    showToast('Please select at least one section');
+    return;
+  }
+
+  const fromDate = new Date(from + 'T00:00:00');
+  const toDate = new Date(to + 'T23:59:59');
+  const child = state.childName || 'Child';
+  const parentA = state.parentAName || 'Parent A';
+  const parentB = state.parentBName || 'Parent B';
+  const generatedAt = new Date().toISOString();
+  const generatedDisplay = new Date().toLocaleString('en-GB', { day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit' });
+  const fromDisplay = fromDate.toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
+  const toDisplay = toDate.toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
+
+  const sections = [];
+  let sectionsHtml = '';
+
+  // ─ Messages ─
+  if (inclMessages) {
+    sections.push('Messages');
+    const msgs = state.messages;
+    const rows = msgs.length ? msgs.map(m => {
+      const sender = m.from === 'A' ? parentA : parentB;
+      const time = m.timestamp ? new Date(m.timestamp).toLocaleString('en-GB') : (m.time || '\u2014');
+      return `<tr><td style="padding:8px 12px;border:1px solid #ddd;font-weight:600;white-space:nowrap;">${escHtml(sender)}</td><td style="padding:8px 12px;border:1px solid #ddd;white-space:nowrap;">${escHtml(time)}</td><td style="padding:8px 12px;border:1px solid #ddd;">${escHtml(m.text)}</td></tr>`;
+    }).join('') : `<tr><td colspan="3" style="padding:12px;border:1px solid #ddd;color:#888;font-style:italic;">No messages in this date range</td></tr>`;
+    sectionsHtml += bundleSectionHtml('\ud83d\udcac Message Log', ['Sender', 'Timestamp', 'Message'], rows);
+  }
+
+  // ─ Handovers ─
+  if (inclHandovers) {
+    sections.push('Handovers');
+    const all = JSON.parse(localStorage.getItem('kinnect_handovers') || '[]');
+    const handovers = all.filter(h => {
+      const d = new Date(h.dateTime);
+      return d >= fromDate && d <= toDate;
+    });
+    const rows = handovers.length ? handovers.map(h => {
+      const dt = new Date(h.dateTime);
+      const dtStr = dt.toLocaleString('en-GB');
+      return `<tr><td style="padding:8px 12px;border:1px solid #ddd;white-space:nowrap;">${dtStr}</td><td style="padding:8px 12px;border:1px solid #ddd;font-weight:600;">Collected by ${escHtml(h.collectorLabel)}</td><td style="padding:8px 12px;border:1px solid #ddd;">${escHtml(h.location || '\u2014')}</td><td style="padding:8px 12px;border:1px solid #ddd;">${escHtml(h.notes || '\u2014')}</td></tr>`;
+    }).join('') : `<tr><td colspan="4" style="padding:12px;border:1px solid #ddd;color:#888;font-style:italic;">No handovers in this date range</td></tr>`;
+    sectionsHtml += bundleSectionHtml('\ud83e\udd1d Handover Log', ['Date &amp; Time', 'Collector', 'Location', 'Notes'], rows);
+  }
+
+  // ─ Expenses ─
+  if (inclExpenses) {
+    sections.push('Expenses');
+    sectionsHtml += bundleSectionHtml('\ud83d\udcb0 Expense Records', ['Date', 'Description', 'Amount', 'Paid By'],
+      `<tr><td colspan="4" style="padding:12px;border:1px solid #ddd;color:#888;font-style:italic;">No expense records found. Expense tracking will be available in a future update.</td></tr>`);
+  }
+
+  // ─ Incidents ─
+  if (inclIncidents) {
+    sections.push('Incidents');
+    sectionsHtml += bundleSectionHtml('\u26a0\ufe0f Incident Reports', ['Date', 'Reported By', 'Description'],
+      `<tr><td colspan="3" style="padding:12px;border:1px solid #ddd;color:#888;font-style:italic;">No incident reports found. Incident reporting will be available in a future update.</td></tr>`);
+  }
+
+  // ─ Calendar ─
+  if (inclCalendar) {
+    sections.push('Calendar');
+    const reqs = state.requests;
+    const rows = reqs.length ? reqs.map(r => {
+      const fromName = r.from === 'A' ? parentA : parentB;
+      return `<tr><td style="padding:8px 12px;border:1px solid #ddd;">${escHtml(r.dates)}</td><td style="padding:8px 12px;border:1px solid #ddd;font-weight:600;">${escHtml(fromName)}</td><td style="padding:8px 12px;border:1px solid #ddd;">${escHtml(r.reason)}</td><td style="padding:8px 12px;border:1px solid #ddd;"><span style="font-weight:700;text-transform:uppercase;font-size:11px;">${r.status}</span></td></tr>`;
+    }).join('') : `<tr><td colspan="4" style="padding:12px;border:1px solid #ddd;color:#888;font-style:italic;">No schedule change requests found</td></tr>`;
+    sectionsHtml += bundleSectionHtml('\ud83d\udcc5 Calendar Events &amp; Schedule Changes', ['Date', 'Requested By', 'Reason', 'Status'], rows);
+  }
+
+  // ─ Daily Log ─
+  if (inclLog) {
+    sections.push('Daily Log');
+    const logs = state.logs.filter(l => {
+      const d = new Date((l.logDate || l.date || '') + 'T00:00:00');
+      return d >= fromDate && d <= toDate;
+    });
+    const rows = logs.length ? logs.map(l => {
+      const pName = l.parent === 'A' ? parentA : parentB;
+      const parts = [];
+      if (l.meals && l.meals.length) parts.push(`Meals: ${l.meals.join(', ')}`);
+      if (l.drinks && l.drinks.length) parts.push(`Drinks: ${l.drinks.join(', ')}`);
+      if (l.nap) parts.push(`Nap: ${l.nap}`);
+      if (l.mood) parts.push(`Mood: ${l.mood}`);
+      if (l.flag) parts.push(`Flag: ${l.flag}`);
+      if (l.notes) parts.push(l.notes);
+      const dtStr = `${l.logDate || l.date || '\u2014'} ${l.time || ''}`.trim();
+      return `<tr><td style="padding:8px 12px;border:1px solid #ddd;white-space:nowrap;">${dtStr}</td><td style="padding:8px 12px;border:1px solid #ddd;font-weight:600;">${escHtml(pName)}</td><td style="padding:8px 12px;border:1px solid #ddd;">${escHtml(parts.join(' \u2502 '))}</td></tr>`;
+    }).join('') : `<tr><td colspan="3" style="padding:12px;border:1px solid #ddd;color:#888;font-style:italic;">No daily log entries in this date range</td></tr>`;
+    sectionsHtml += bundleSectionHtml('\ud83d\udcdd Daily Log', ['Date &amp; Time', 'Logged By', 'Details'], rows);
+  }
+
+  // Build full print document
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>CoKinnect \u2014 Court Bundle</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, Helvetica, sans-serif; padding: 32px; color: #111; font-size: 13px; line-height: 1.5; }
+    .cover { text-align: center; padding: 48px 0 40px; border-bottom: 3px solid #0d9488; margin-bottom: 40px; }
+    .cover-logo { font-size: 22px; font-weight: 900; color: #0d9488; margin-bottom: 12px; }
+    .cover-title { font-size: 32px; font-weight: 700; color: #0f172a; margin-bottom: 16px; }
+    .cover-meta { color: #475569; font-size: 14px; line-height: 2; }
+    .bundle-section-block { margin-bottom: 40px; page-break-inside: avoid; }
+    h2 { font-size: 15px; font-weight: 700; padding: 10px 0 8px; border-bottom: 2px solid #1e293b; margin-bottom: 0; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    th { background: #1e293b; color: #fff; padding: 9px 12px; text-align: left; font-size: 11px; letter-spacing: 0.5px; text-transform: uppercase; }
+    td { vertical-align: top; }
+    tr:nth-child(even) td { background: #f8fafc; }
+    .footer { margin-top: 48px; padding: 16px; border-top: 1px solid #cbd5e1; font-size: 11px; color: #64748b; text-align: center; background: #f8fafc; }
+    @page { size: A4; margin: 20mm; }
+    @media print {
+      .no-print { display: none !important; }
+      .bundle-section-block { page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <div class="cover">
+    <div class="cover-logo">\ud83e\udd1d CoKinnect</div>
+    <div class="cover-title">Court Bundle</div>
+    <div class="cover-meta">
+      <strong>Child:</strong> ${escHtml(child)}<br/>
+      <strong>Parents:</strong> ${escHtml(parentA)} &amp; ${escHtml(parentB)}<br/>
+      <strong>Date Range:</strong> ${fromDisplay} \u2014 ${toDisplay}<br/>
+      <strong>Generated:</strong> ${generatedDisplay}<br/>
+      <strong>Sections included:</strong> ${sections.join(', ')}
+    </div>
+  </div>
+  ${sectionsHtml}
+  <div class="footer">
+    Generated by CoKinnect on ${generatedDisplay} \u2014 For legal purposes only<br/>
+    Child: ${escHtml(child)} &nbsp;|&nbsp; Parents: ${escHtml(parentA)} &amp; ${escHtml(parentB)} &nbsp;|&nbsp; Period: ${fromDisplay} \u2014 ${toDisplay}<br/>
+    Export timestamp: ${generatedAt}
+  </div>
+  <script>window.onload = function() { window.print(); };<\/script>
+</body>
+</html>`;
+
+  // Save to history
+  const history = JSON.parse(localStorage.getItem('kinnect_bundle_history') || '[]');
+  history.unshift({ id: Date.now(), dateRange: `${fromDisplay} \u2014 ${toDisplay}`, generatedAt: generatedDisplay, sections });
+  localStorage.setItem('kinnect_bundle_history', JSON.stringify(history.slice(0, 20)));
+  renderBundleHistory();
+
+  // Open print window
+  const w = window.open('', '_blank');
+  if (w) {
+    w.document.write(html);
+    w.document.close();
+  } else {
+    showToast('Please allow popups to generate the bundle');
+    return;
+  }
+
+  showToast('Bundle generated \u2713');
 }
 
 // ══ INIT ══
